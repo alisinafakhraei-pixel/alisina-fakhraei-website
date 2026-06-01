@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lapse — Renewal Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ALISINA DESIGN SYSTEM — Foundations
+   ============================================================ */
+:root {
+  --blue-100: #EDF3F8;
+  --blue-200: #DCE9F1;
+  --blue-300: #A8C3D6;
+  --blue-400: #7FA8C4;
+  --blue-500: #4F86AD;
+  --blue-600: #2E5C81;
+
+  --ink:    #0A0A0A;
+  --ink-2:  #484848;
+  --ink-3:  #9A9A9A;
+  --bg:     #FFFFFF;
+  --surface:#EDF3F8;
+  --surface-2:#F6F9FC;
+
+  --accent:      var(--blue-300);
+  --accent-dark: var(--blue-500);
+  --accent-deep: var(--blue-600);
+  --success:     #38B27A;
+  --link:        var(--blue-500);
+
+  --border:      rgba(168,195,214,0.35);
+  --border-hard: rgba(168,195,214,0.62);
+
+  --display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --sans:    "DM Sans", system-ui, -apple-system, sans-serif;
+
+  --shadow-card:  0 18px 40px -30px rgba(20,40,60,0.50);
+  --shadow-hover: 0 30px 60px -30px rgba(20,40,60,0.55);
+  --shadow-stat:  0 18px 40px -26px rgba(20,40,60,0.45);
+  --shadow-float: 0 40px 80px -36px rgba(20,40,60,0.50);
+  --shadow-btn:   0 10px 24px -10px rgba(10,10,10,0.50);
+
+  /* status colors */
+  --danger:      #C0485B;
+  --danger-bg:   #FBEEF0;
+  --danger-bd:   rgba(192,72,91,0.30);
+  --warn:        #C98A2E;
+  --warn-bg:     #FBF3E6;
+  --warn-bd:     rgba(201,138,46,0.30);
+  --ok:          #38B27A;
+  --ok-bg:       #E9F6F0;
+  --ok-bd:       rgba(56,178,122,0.30);
+}
+
+*{ box-sizing:border-box; }
+html, body{
+  margin:0; padding:0; height:100%; width:100%;
+  font-family:var(--sans); color:var(--ink);
+  background:var(--surface);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  display:flex; justify-content:center;
+}
+
+/* ---- app container — locked to phone width ---- */
+.phone{
+  width:100%; max-width:430px; height:100vh; background:var(--bg);
+  overflow:hidden; position:relative;
+  display:flex; flex-direction:column;
+  box-shadow:0 0 60px rgba(20,40,60,0.12);
+}
+
+/* ---- screen ---- */
+.screen{
+  display:none; flex-direction:column; flex:1; overflow:hidden;
+  position:absolute; inset:0;
+}
+.screen.active{ display:flex; }
+
+/* status bar */
+.statusbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 28px 6px; font-family:var(--display); font-weight:600; font-size:14px; letter-spacing:-0.01em;
+  flex-shrink:0;
+}
+.sb-icons{ display:flex; align-items:center; gap:6px; }
+
+/* app bar */
+.appbar{ padding:6px 22px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.appbar h1{ font-family:var(--display); font-weight:600; font-size:27px; letter-spacing:-0.03em; margin:0; }
+.appbar .sub{ font-size:13px; color:var(--ink-3); margin-top:3px; }
+
+/* scrollable body */
+.body{
+  flex:1; overflow-y:auto; padding:0 22px;
+  -webkit-overflow-scrolling:touch;
+}
+.body::-webkit-scrollbar{ display:none; }
+
+/* summary bar */
+.summary{
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; background:var(--bg);
+  border:0.5px solid var(--border-hard); border-top:2px solid var(--accent); border-radius:16px; overflow:hidden;
+  box-shadow:var(--shadow-stat);
+}
+.summary .cell{ padding:16px 14px; border-right:0.5px solid var(--border); }
+.summary .cell:last-child{ border-right:none; }
+.summary .num{ font-family:var(--display); font-weight:600; font-size:24px; line-height:1; letter-spacing:-0.02em; }
+.summary .num small{ font-family:var(--display); font-size:13px; font-weight:500; color:var(--ink-2); }
+.summary .lbl{ font-size:11px; color:var(--ink-3); margin-top:7px; line-height:1.3; }
+
+/* alert strip */
+.alert{
+  margin-top:14px; background:var(--danger-bg); border:0.5px solid var(--danger-bd);
+  border-left:4px solid var(--danger); border-radius:14px; padding:13px 15px;
+}
+.alert .hd{ display:flex; align-items:center; gap:8px; color:var(--danger); font-weight:600; font-size:13px; }
+.alert .ln{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:9px; font-size:13px; }
+.alert .ln .nm{ font-weight:500; color:var(--ink); }
+.alert .ln .dt{ color:var(--danger); font-weight:600; font-size:12px; white-space:nowrap; }
+.alert-empty{ display:none; }
+
+.section-cap{ display:flex; align-items:center; justify-content:space-between; margin:22px 2px 12px; }
+.section-cap .kick{ font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-dark); }
+.section-cap .count{ font-family:var(--display); font-weight:600; font-size:13px; color:var(--ink-3); }
+
+/* item cards */
+.stack{ display:flex; flex-direction:column; gap:12px; }
+.item{
+  background:var(--bg); border:0.5px solid var(--border-hard); border-radius:18px;
+  padding:15px 16px; box-shadow:0 14px 34px -28px rgba(20,40,60,0.5);
+  display:flex; gap:13px; align-items:flex-start; cursor:pointer;
+  transition:box-shadow .15s;
+}
+.item:active{ box-shadow:0 6px 16px -14px rgba(20,40,60,0.5); }
+.cat-tile{
+  width:44px; height:44px; border-radius:13px; flex-shrink:0; background:var(--surface);
+  border:0.5px solid var(--border-hard); display:flex; align-items:center; justify-content:center; color:var(--accent-dark);
+}
+.item .main{ flex:1; min-width:0; }
+.item .top{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.item .nm{ font-family:var(--display); font-weight:600; font-size:17px; letter-spacing:-0.01em; line-height:1.15; }
+.item .cost{ font-family:var(--display); font-weight:600; font-size:17px; letter-spacing:-0.01em; white-space:nowrap; }
+.item .cost small{ font-family:var(--sans); font-size:11px; font-weight:500; color:var(--ink-3); }
+.item .meta{ display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.tag{
+  font-size:11px; font-weight:500; background:var(--surface); color:var(--accent-dark);
+  border:0.5px solid var(--border-hard); border-radius:999px; padding:3px 10px; white-space:nowrap;
+}
+.dot-sep{ color:var(--ink-3); font-size:11px; }
+.date-meta{ font-size:12px; color:var(--ink-3); }
+.item .foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:11px; }
+.days{ font-size:12px; color:var(--ink-2); }
+.days b{ font-family:var(--display); font-weight:600; color:var(--ink); }
+
+/* status pill */
+.status{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
+  font-size:11px; font-weight:600; white-space:nowrap; }
+.status .sdot{ width:6px; height:6px; border-radius:50%; }
+.st-overdue,.st-due7{ background:var(--danger-bg); color:var(--danger); border:0.5px solid var(--danger-bd); }
+.st-overdue .sdot,.st-due7 .sdot{ background:var(--danger); }
+.st-due30{ background:var(--warn-bg); color:var(--warn); border:0.5px solid var(--warn-bd); }
+.st-due30 .sdot{ background:var(--warn); }
+.st-ok{ background:var(--ok-bg); color:var(--ok); border:0.5px solid var(--ok-bd); }
+.st-ok .sdot{ background:var(--ok); box-shadow:0 0 0 3px rgba(56,178,122,0.16); }
+
+/* empty state */
+.empty-state{
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; padding:60px 20px; text-align:center;
+}
+.empty-state.show{ display:flex; }
+.empty-state .ei{ font-size:40px; opacity:.5; }
+.empty-state .et{ font-family:var(--display); font-weight:600; font-size:18px; letter-spacing:-0.01em; }
+.empty-state .es{ font-size:14px; color:var(--ink-3); line-height:1.5; }
+
+/* FAB */
+.fab{
+  position:absolute; right:20px; bottom:82px; width:58px; height:58px; border-radius:20px;
+  background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 22px 40px -16px rgba(10,10,10,0.55); z-index:5; cursor:pointer;
+  transition:transform .15s, box-shadow .15s;
+}
+.fab:active{ transform:scale(.95); }
+
+/* tab bar */
+.tabbar{
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-around;
+  padding:10px 14px 22px; border-top:0.5px solid var(--border);
+  background:rgba(255,255,255,0.92); backdrop-filter:saturate(180%) blur(16px);
+  position:absolute; bottom:0; left:0; right:0; z-index:4;
+}
+.tab{ display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--ink-3); font-size:10.5px; font-weight:500; cursor:pointer; padding:2px 12px; }
+.tab.active{ color:var(--ink); }
+.tab.active .tab-ic{ color:var(--accent-dark); }
+
+/* ---- INSIGHTS ---- */
+.metric-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.metric{
+  background:var(--bg); border:0.5px solid var(--border-hard); border-left:4px solid var(--accent);
+  border-radius:16px; padding:16px; box-shadow:0 14px 34px -28px rgba(20,40,60,0.5);
+}
+.metric .num{ font-family:var(--display); font-weight:600; font-size:28px; line-height:1; letter-spacing:-0.025em; }
+.metric .num small{ font-family:var(--display); font-size:14px; font-weight:500; color:var(--ink-2); }
+.metric .lbl{ font-size:11.5px; color:var(--ink-3); margin-top:9px; line-height:1.3; }
+
+.panel{
+  background:var(--bg); border:0.5px solid var(--border-hard); border-radius:18px;
+  padding:18px; margin-top:14px; box-shadow:0 14px 34px -28px rgba(20,40,60,0.5);
+}
+.panel-hd{ font-family:var(--display); font-weight:600; font-size:16px; letter-spacing:-0.01em; }
+.panel-sub{ font-size:12px; color:var(--ink-3); margin-top:3px; }
+
+.donut-row{ display:flex; align-items:center; gap:18px; margin-top:16px; }
+.donut{ width:120px; height:120px; border-radius:50%; flex-shrink:0; position:relative; }
+.donut::after{ content:""; position:absolute; inset:26px; border-radius:50%; background:var(--bg);
+  box-shadow:inset 0 1px 3px rgba(20,40,60,0.08); }
+.donut .ctr{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1; }
+.donut .ctr b{ font-family:var(--display); font-weight:600; font-size:18px; line-height:1; }
+.donut .ctr span{ font-size:9.5px; color:var(--ink-3); margin-top:2px; }
+.legend{ flex:1; display:flex; flex-direction:column; gap:9px; }
+.leg{ display:flex; align-items:center; gap:9px; font-size:12.5px; }
+.leg .sw{ width:11px; height:11px; border-radius:4px; flex-shrink:0; }
+.leg .lname{ color:var(--ink-2); }
+.leg .lpct{ margin-left:auto; font-family:var(--display); font-weight:600; color:var(--ink); }
+
+.bars{ display:flex; align-items:flex-end; justify-content:space-between; gap:5px; height:118px; margin-top:18px; }
+.bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; height:100%; justify-content:flex-end; }
+.bar{ width:100%; max-width:18px; border-radius:5px 5px 0 0; background:var(--blue-300); min-height:3px; }
+.bar.hot{ background:var(--blue-600); }
+.bar-lbl{ font-size:9px; color:var(--ink-3); font-weight:500; }
+
+.rank{ display:flex; gap:13px; align-items:center; padding:13px 2px; border-bottom:0.5px solid var(--border); }
+.rank:last-child{ border-bottom:none; }
+.rank .pos{ font-family:var(--display); font-weight:600; font-size:15px; color:var(--ink-3); width:18px; flex-shrink:0; }
+.rank .rmain{ flex:1; min-width:0; }
+.rank .rnm{ font-weight:600; font-size:14px; }
+.rank .rmeta{ font-size:11.5px; color:var(--ink-3); margin-top:2px; }
+.rank .rcost{ font-family:var(--display); font-weight:600; font-size:15px; white-space:nowrap; }
+.rank .rcost small{ font-family:var(--sans); font-size:10px; font-weight:500; color:var(--ink-3); }
+
+/* ---- RENEWALS ---- */
+.filterbar{ display:flex; flex-direction:column; gap:9px; padding-bottom:4px; }
+.filter-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; }
+.filter-row::-webkit-scrollbar{ display:none; }
+.fpill{
+  font-size:12px; font-weight:500; background:var(--bg); color:var(--ink-2);
+  border:0.5px solid var(--border-hard); border-radius:999px; padding:6px 13px; white-space:nowrap; cursor:pointer;
+  flex-shrink:0;
+}
+.fpill.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+.sort-row{ display:flex; align-items:center; justify-content:space-between; margin:14px 2px 12px; }
+.sort-row .lbl{ font-size:11px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); }
+.sort-toggle{ display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:500; color:var(--accent-dark);
+  background:var(--surface); border:0.5px solid var(--border-hard); border-radius:999px; padding:6px 13px; cursor:pointer; }
+
+.rlist{ display:flex; flex-direction:column; gap:10px; }
+.rrow{
+  background:var(--bg); border:0.5px solid var(--border-hard); border-left-width:4px; border-radius:14px;
+  padding:13px 15px 13px 14px; display:flex; align-items:center; gap:12px;
+  box-shadow:0 12px 30px -28px rgba(20,40,60,0.5);
+}
+.rrow.s-overdue,.rrow.s-due7{ border-left-color:var(--danger); }
+.rrow.s-due30{ border-left-color:var(--warn); }
+.rrow.s-ok{ border-left-color:var(--accent); }
+.rrow .rmain{ flex:1; min-width:0; }
+.rrow .rtop{ display:flex; align-items:center; gap:8px; }
+.rrow .rnm{ font-family:var(--display); font-weight:600; font-size:15.5px; letter-spacing:-0.01em; }
+.rrow .rmeta{ font-size:12px; color:var(--ink-3); margin-top:5px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.rrow .rdays{ font-weight:600; }
+.rrow .rdays.over,.rrow .rdays.d7{ color:var(--danger); }
+.rrow .rdays.d30{ color:var(--warn); }
+.rrow .rright{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.rrow .rcost{ font-family:var(--display); font-weight:600; font-size:15px; text-align:right; white-space:nowrap; }
+.rrow .rcost small{ font-family:var(--sans); font-size:10px; font-weight:500; color:var(--ink-3); }
+.edit-btn{
+  width:34px; height:34px; border-radius:11px; background:var(--surface); border:0.5px solid var(--border-hard);
+  display:flex; align-items:center; justify-content:center; color:var(--ink-2); flex-shrink:0; cursor:pointer;
+}
+.no-results{
+  display:none; flex-direction:column; align-items:center; gap:10px; padding:40px 0; text-align:center;
+}
+.no-results.show{ display:flex; }
+.no-results p{ font-size:14px; color:var(--ink-3); margin:0; }
+.clear-btn{
+  font-size:13px; font-weight:600; color:var(--accent-dark); background:var(--surface);
+  border:0.5px solid var(--border-hard); border-radius:999px; padding:8px 16px; cursor:pointer;
+}
+
+/* ---- FORM ---- */
+.form-appbar{ padding:6px 22px 14px; display:flex; align-items:center; gap:14px; flex-shrink:0; }
+.form-appbar .back{
+  width:40px; height:40px; border-radius:13px; background:var(--surface);
+  border:0.5px solid var(--border-hard); display:flex; align-items:center; justify-content:center;
+  color:var(--ink-2); flex-shrink:0; cursor:pointer;
+}
+.form-appbar h1{ font-family:var(--display); font-weight:600; font-size:23px; letter-spacing:-0.025em; margin:0; }
+.form-appbar .sub{ font-size:12.5px; color:var(--ink-3); margin-top:2px; }
+
+.field{ margin-top:18px; }
+.field > label{ display:block; font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); margin-bottom:9px; }
+.input{
+  width:100%; background:var(--bg); border:0.5px solid var(--border-hard); border-radius:14px;
+  padding:14px 15px; font-family:var(--sans); font-size:15.5px; color:var(--ink);
+  box-shadow:0 10px 26px -26px rgba(20,40,60,0.5); outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.input:focus{ border-color:var(--accent-dark); box-shadow:0 0 0 3px rgba(79,134,173,0.15); }
+.input::placeholder{ color:var(--ink-3); }
+input[type="date"].input{ cursor:pointer; }
+.input-icon{ position:relative; }
+.input-icon .input{ padding-left:38px; }
+.input-icon .lead{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--ink-3); font-family:var(--display); font-weight:600; font-size:16px; }
+.input-icon .cal{ position:absolute; right:15px; top:50%; transform:translateY(-50%); color:var(--accent-dark); pointer-events:none; }
+
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.seg{ display:grid; grid-template-columns:1fr 1fr; gap:5px; background:var(--surface);
+  border:0.5px solid var(--border-hard); border-radius:14px; padding:5px; cursor:pointer; }
+.seg .opt{ text-align:center; padding:11px 0; border-radius:10px; font-size:14px; font-weight:600; color:var(--ink-2); user-select:none; }
+.seg .opt.on{ background:var(--bg); color:var(--ink); box-shadow:0 6px 16px -10px rgba(20,40,60,0.4); }
+
+.cat-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+.cat-chip{
+  display:inline-flex; align-items:center; gap:7px; padding:9px 14px; border-radius:999px;
+  background:var(--bg); border:0.5px solid var(--border-hard); font-size:13.5px; font-weight:500;
+  color:var(--ink-2); cursor:pointer; user-select:none;
+}
+.cat-chip svg{ color:var(--ink-3); }
+.cat-chip.on{ background:var(--ink); border-color:var(--ink); color:#fff; }
+.cat-chip.on svg{ color:#fff; }
+
+textarea.input{ resize:none; line-height:1.5; }
+input[type="date"].input::-webkit-calendar-picker-indicator{
+  opacity:0.5; cursor:pointer; color:var(--accent-dark); filter:none;
+}
+
+.form-body{
+  flex:1; overflow-y:auto; padding:0 22px;
+  -webkit-overflow-scrolling:touch;
+}
+.form-body::-webkit-scrollbar{ display:none; }
+
+.form-actions{ flex-shrink:0; padding:14px 22px 26px; border-top:0.5px solid var(--border);
+  background:rgba(255,255,255,0.94); backdrop-filter:saturate(180%) blur(16px); display:flex; gap:11px; }
+.btn{ flex:1; text-align:center; padding:15px 0; border-radius:999px; font-family:var(--display);
+  font-weight:600; font-size:15.5px; letter-spacing:-0.01em; cursor:pointer; transition:opacity .15s; }
+.btn:active{ opacity:.75; }
+.btn-primary{ background:var(--ink); color:#fff; box-shadow:var(--shadow-btn); flex:2; border:none; }
+.btn-ghost{ background:var(--surface); border:0.5px solid var(--border-hard); color:var(--ink-2); }
+
+.delete-btn{
+  display:flex; width:100%; align-items:center; justify-content:center; gap:9px;
+  color:var(--danger); border-color:var(--danger-bd); background:var(--danger-bg);
+  padding:15px; border-radius:999px; font-family:var(--display); font-weight:600; font-size:15px;
+  cursor:pointer; border:0.5px solid var(--danger-bd); margin-top:18px;
+  transition:opacity .15s;
+}
+.delete-btn:active{ opacity:.7; }
+.delete-confirm{
+  margin-top:18px; background:var(--danger-bg); border:0.5px solid var(--danger-bd);
+  border-radius:16px; padding:16px;
+}
+.delete-confirm p{ margin:0 0 12px; font-size:14px; color:var(--danger); font-weight:500; line-height:1.4; }
+.delete-confirm .dc-btns{ display:flex; gap:10px; }
+.delete-confirm .dc-cancel{ flex:1; text-align:center; padding:11px 0; border-radius:999px;
+  background:var(--bg); border:0.5px solid var(--border-hard); color:var(--ink-2);
+  font-family:var(--display); font-weight:600; font-size:14px; cursor:pointer; }
+.delete-confirm .dc-yes{ flex:1; text-align:center; padding:11px 0; border-radius:999px;
+  background:var(--danger); color:#fff; border:none;
+  font-family:var(--display); font-weight:600; font-size:14px; cursor:pointer; }
+
+/* validation error */
+.input.err{ border-color:var(--danger); }
+
+/* scrollable screens use padding-bottom for tab bar */
+.screen-home .body, .screen-renewals .body, .screen-insights .body{
+  padding-bottom:80px;
+}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+
+  <!-- ============================================================
+       SCREEN: HOME
+       ============================================================ -->
+  <div class="screen screen-home active" id="scr-home">
+
+    <div class="appbar">
+      <div>
+        <h1 id="home-greeting">Good morning</h1>
+        <div class="sub" id="home-date">Loading…</div>
+      </div>
+    </div>
+    <div class="body" id="home-body">
+      <!-- summary bar -->
+      <div class="summary">
+        <div class="cell">
+          <div class="num" id="h-monthly">—</div>
+          <div class="lbl">Monthly spend</div>
+        </div>
+        <div class="cell">
+          <div class="num" id="h-annual">—</div>
+          <div class="lbl">Annual spend</div>
+        </div>
+        <div class="cell">
+          <div class="num" id="h-due30">—</div>
+          <div class="lbl">Renewing in 30 days</div>
+        </div>
+      </div>
+
+      <!-- alert strip -->
+      <div class="alert" id="home-alert" style="display:none;">
+        <div class="hd">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+          Needs attention now
+        </div>
+        <div id="home-alert-lines"></div>
+      </div>
+
+      <div class="section-cap">
+        <span class="kick">All items</span>
+        <span class="count" id="home-count">0</span>
+      </div>
+
+      <div class="stack" id="home-stack"></div>
+
+      <div class="empty-state" id="home-empty">
+        <div class="ei">📋</div>
+        <div class="et">No subscriptions yet</div>
+        <div class="es">Tap the + button to add your first contract, tool, or license.</div>
+      </div>
+
+      <div style="height:14px;"></div>
+    </div>
+
+    <!-- FAB -->
+    <div class="fab" id="fab-add" title="Add subscription">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+    </div>
+
+    <nav class="tabbar">
+      <div class="tab active" data-tab="home">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"></path></svg></span>
+        Home
+      </div>
+      <div class="tab" data-tab="renewals">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3.5" y1="6" x2="3.51" y2="6"></line><line x1="3.5" y1="12" x2="3.51" y2="12"></line><line x1="3.5" y1="18" x2="3.51" y2="18"></line></svg></span>
+        Renewals
+      </div>
+      <div class="tab" data-tab="insights">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg></span>
+        Insights
+      </div>
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       SCREEN: RENEWALS
+       ============================================================ -->
+  <div class="screen screen-renewals" id="scr-renewals">
+
+    <div class="appbar">
+      <div>
+        <h1>Renewals</h1>
+        <div class="sub" id="ren-sub">Loading…</div>
+      </div>
+    </div>
+    <div class="body">
+      <div class="filterbar">
+        <div class="filter-row" id="filter-cat">
+          <span class="fpill on" data-val="All">All</span>
+          <span class="fpill" data-val="SaaS">SaaS</span>
+          <span class="fpill" data-val="Contract">Contract</span>
+          <span class="fpill" data-val="License">License</span>
+          <span class="fpill" data-val="Domain">Domain</span>
+          <span class="fpill" data-val="Insurance">Insurance</span>
+          <span class="fpill" data-val="Other">Other</span>
+        </div>
+        <div class="filter-row" id="filter-status">
+          <span class="fpill on" data-val="All">All status</span>
+          <span class="fpill" data-val="overdue">Overdue</span>
+          <span class="fpill" data-val="due7">Due 7d</span>
+          <span class="fpill" data-val="due30">Due 30d</span>
+          <span class="fpill" data-val="ok">OK</span>
+        </div>
+      </div>
+
+      <div class="sort-row">
+        <span class="lbl" id="sort-label">Sorted by date</span>
+        <span class="sort-toggle" id="sort-toggle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10"></path><path d="M11 9h7"></path><path d="M11 13h4"></path><path d="m3 17 3 3 3-3"></path><path d="M6 18V4"></path></svg>
+          <span id="sort-label-inner">Date ↑</span>
+        </span>
+      </div>
+
+      <div class="rlist" id="ren-list"></div>
+
+      <div class="no-results" id="no-results">
+        <p>Nothing matches these filters.</p>
+        <span class="clear-btn" id="clear-filters">Clear filters</span>
+      </div>
+
+      <div style="height:14px;"></div>
+    </div>
+
+    <nav class="tabbar">
+      <div class="tab" data-tab="home">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"></path></svg></span>
+        Home
+      </div>
+      <div class="tab active" data-tab="renewals">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3.5" y1="6" x2="3.51" y2="6"></line><line x1="3.5" y1="12" x2="3.51" y2="12"></line><line x1="3.5" y1="18" x2="3.51" y2="18"></line></svg></span>
+        Renewals
+      </div>
+      <div class="tab" data-tab="insights">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg></span>
+        Insights
+      </div>
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       SCREEN: INSIGHTS
+       ============================================================ -->
+  <div class="screen screen-insights" id="scr-insights">
+
+    <div class="appbar">
+      <div>
+        <h1>Insights</h1>
+        <div class="sub">Where your money goes</div>
+      </div>
+    </div>
+    <div class="body" id="insights-body">
+      <div class="metric-grid">
+        <div class="metric"><div class="num" id="ins-monthly">—</div><div class="lbl">Monthly spend</div></div>
+        <div class="metric"><div class="num" id="ins-annual">—</div><div class="lbl">Annual spend</div></div>
+        <div class="metric"><div class="num" id="ins-active">—</div><div class="lbl">Active items</div></div>
+        <div class="metric"><div class="num" id="ins-thismonth">—</div><div class="lbl">Renewals this month</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hd">Spend by category</div>
+        <div class="panel-sub">Share of total annual spend</div>
+        <div class="donut-row">
+          <div class="donut" id="ins-donut">
+            <div class="ctr"><b id="ins-donut-total">—</b><span>per year</span></div>
+          </div>
+          <div class="legend" id="ins-legend"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hd">Renewal timeline</div>
+        <div class="panel-sub">Total renewals due, next 12 months</div>
+        <div class="bars" id="ins-bars"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hd">Most expensive</div>
+        <div class="panel-sub">Top 5 by annual cost</div>
+        <div style="margin-top:8px;" id="ins-top5"></div>
+      </div>
+
+      <div style="height:14px;"></div>
+    </div>
+
+    <nav class="tabbar">
+      <div class="tab" data-tab="home">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"></path></svg></span>
+        Home
+      </div>
+      <div class="tab" data-tab="renewals">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3.5" y1="6" x2="3.51" y2="6"></line><line x1="3.5" y1="12" x2="3.51" y2="12"></line><line x1="3.5" y1="18" x2="3.51" y2="18"></line></svg></span>
+        Renewals
+      </div>
+      <div class="tab active" data-tab="insights">
+        <span class="tab-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg></span>
+        Insights
+      </div>
+    </nav>
+  </div>
+
+  <!-- ============================================================
+       SCREEN: FORM (Add / Edit)
+       ============================================================ -->
+  <div class="screen" id="scr-form">
+
+    <div class="form-appbar">
+      <span class="back" id="form-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+      </span>
+      <div>
+        <h1 id="form-title">New subscription</h1>
+        <div class="sub" id="form-sub">Add a contract, tool or license</div>
+      </div>
+    </div>
+
+    <div class="form-body">
+      <div class="field">
+        <label>Name</label>
+        <input type="text" class="input" id="f-name" placeholder="e.g. Figma, Office lease…" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <div class="cat-grid" id="f-cat-grid">
+          <span class="cat-chip" data-cat="SaaS">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0 0-9H3a4 4 0 0 1 0-8h11"></path></svg>SaaS</span>
+          <span class="cat-chip" data-cat="Contract">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>Contract</span>
+          <span class="cat-chip" data-cat="License">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>License</span>
+          <span class="cat-chip" data-cat="Domain">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>Domain</span>
+          <span class="cat-chip" data-cat="Insurance">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>Insurance</span>
+          <span class="cat-chip" data-cat="Other">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>Other</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cost</label>
+        <div class="two-col">
+          <div class="input-icon">
+            <span class="lead">$</span>
+            <input type="number" class="input" id="f-cost" placeholder="0.00" min="0" step="0.01" style="padding-left:38px;">
+          </div>
+          <div class="seg" id="f-cycle">
+            <span class="opt on" data-cycle="monthly">Monthly</span>
+            <span class="opt" data-cycle="annual">Annual</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Renewal date</label>
+        <input type="date" class="input" id="f-date">
+      </div>
+
+      <div class="field">
+        <label>Notes <span style="color:var(--ink-3);font-weight:500;text-transform:none;letter-spacing:0;">· optional</span></label>
+        <textarea class="input" id="f-notes" rows="3" style="height:auto;" placeholder="Plan tier, account owner, cancellation terms…"></textarea>
+      </div>
+
+      <div id="f-delete-wrap"></div>
+      <div style="height:14px;"></div>
+    </div>
+
+    <div class="form-actions">
+      <span class="btn btn-ghost" id="form-cancel">Cancel</span>
+      <span class="btn btn-primary" id="form-save">Save</span>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const SEED = [
+  { id:'1', name:'Office Cleaning', category:'Contract', cost:200, cycle:'monthly', renewalDate:'2026-05-30', notes:'Monthly cleaning contract with CleanCo.' },
+  { id:'2', name:'Figma',           category:'SaaS',     cost:15,  cycle:'monthly', renewalDate:'2026-06-04', notes:'Pro plan, design team.' },
+  { id:'3', name:'Notion',          category:'SaaS',     cost:96,  cycle:'annual',  renewalDate:'2026-07-16', notes:'Team plan, 12 seats.' },
+];
+
+function loadItems() {
+  try {
+    const raw = localStorage.getItem('lapse_items_v2');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(SEED));
+}
+
+function saveItems(items) {
+  localStorage.setItem('lapse_items_v2', JSON.stringify(items));
+}
+
+let items = loadItems();
+
+/* ============================================================
+   DATE HELPERS
+   ============================================================ */
+function today() {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function parseDate(str) {
+  const [y,m,d] = str.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+function daysUntil(dateStr) {
+  const t = today();
+  const r = parseDate(dateStr);
+  return Math.round((r - t) / 86400000);
+}
+
+function statusOf(item) {
+  const d = daysUntil(item.renewalDate);
+  if (d < 0)  return 'overdue';
+  if (d <= 7)  return 'due7';
+  if (d <= 30) return 'due30';
+  return 'ok';
+}
+
+function statusClass(s) {
+  return { overdue:'st-overdue', due7:'st-due7', due30:'st-due30', ok:'st-ok' }[s];
+}
+
+function statusLabel(s) {
+  return { overdue:'Overdue', due7:'Due in 7 days', due30:'Due in 30 days', ok:'OK' }[s];
+}
+
+function rowStatusClass(s) {
+  return { overdue:'s-overdue', due7:'s-due7', due30:'s-due30', ok:'s-ok' }[s];
+}
+
+function formatDate(str) {
+  const d = parseDate(str);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function annualCost(item) {
+  return item.cycle === 'monthly' ? item.cost * 12 : item.cost;
+}
+
+function monthlyCost(item) {
+  return item.cycle === 'monthly' ? item.cost : item.cost / 12;
+}
+
+function fmtMoney(n, compact) {
+  if (compact && n >= 1000) {
+    const k = n / 1000;
+    return k % 1 === 0 ? `$${k}k` : `$${k.toFixed(1).replace(/\.0$/,'')}k`;
+  }
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits:0, maximumFractionDigits:0 });
+}
+
+/* ============================================================
+   ROUTING / SCREENS
+   ============================================================ */
+let currentTab = 'home';
+let formReturnTab = 'home';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goTab(tab) {
+  currentTab = tab;
+  showScreen('scr-' + tab);
+  renderTab(tab);
+}
+
+function renderTab(tab) {
+  if (tab === 'home') renderHome();
+  else if (tab === 'renewals') renderRenewals();
+  else if (tab === 'insights') renderInsights();
+}
+
+
+/* ============================================================
+   HOME
+   ============================================================ */
+const GREETINGS = {
+  morning: ['Good morning', 'Rise and grind', 'Morning'],
+  afternoon: ['Good afternoon', 'Afternoon'],
+  evening: ['Good evening', 'Evening'],
+};
+
+function renderHome() {
+  // greeting + date
+  const now = new Date();
+  const h = now.getHours();
+  let period = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  const opts = GREETINGS[period];
+  document.getElementById('home-greeting').textContent = opts[0];
+  document.getElementById('home-date').textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  const sorted = [...items].slice().reverse();
+
+  // summary
+  const totalMonthly = items.reduce((s,i) => s + monthlyCost(i), 0);
+  const totalAnnual  = items.reduce((s,i) => s + annualCost(i), 0);
+  const due30Count   = items.filter(i => { const d = daysUntil(i.renewalDate); return d >= 0 && d <= 30; }).length;
+
+  document.getElementById('h-monthly').innerHTML = fmtMoneyHtml(totalMonthly);
+  document.getElementById('h-annual').innerHTML  = fmtMoneyHtml(totalAnnual, true);
+  document.getElementById('h-due30').textContent = due30Count;
+
+  // alert strip
+  const urgent = sorted.filter(i => { const d = daysUntil(i.renewalDate); return d <= 7; });
+  const alertEl = document.getElementById('home-alert');
+  if (urgent.length > 0) {
+    alertEl.style.display = '';
+    const lines = urgent.map(i => {
+      const d = daysUntil(i.renewalDate);
+      const label = d < 0 ? `Overdue · ${formatDate(i.renewalDate)}` : `${d} day${d===1?'':'s'} · ${formatDate(i.renewalDate)}`;
+      return `<div class="ln"><span class="nm">${esc(i.name)}</span><span class="dt">${esc(label)}</span></div>`;
+    }).join('');
+    document.getElementById('home-alert-lines').innerHTML = lines;
+  } else {
+    alertEl.style.display = 'none';
+  }
+
+  // item count
+  document.getElementById('home-count').textContent = items.length;
+
+  // cards
+  const stack = document.getElementById('home-stack');
+  const empty = document.getElementById('home-empty');
+  if (sorted.length === 0) {
+    stack.innerHTML = '';
+    empty.classList.add('show');
+  } else {
+    empty.classList.remove('show');
+    stack.innerHTML = sorted.map(item => itemCardHTML(item)).join('');
+    stack.querySelectorAll('.item').forEach(el => {
+      el.addEventListener('click', () => openForm(el.dataset.id));
+    });
+  }
+}
+
+function fmtMoneyHtml(n, compact) {
+  if (compact && n >= 1000) {
+    const k = n / 1000;
+    const kStr = k % 1 === 0 ? String(k) : k.toFixed(1).replace(/\.0$/, '');
+    return `<small>$</small>${kStr}<small>k</small>`;
+  }
+  const rounded = Math.round(n);
+  return `<small>$</small>${rounded.toLocaleString('en-US')}`;
+}
+
+function categoryIcon(cat) {
+  const icons = {
+    SaaS: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0 0-9H3a4 4 0 0 1 0-8h11"></path></svg>`,
+    Contract: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>`,
+    License: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+    Domain: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+    Insurance: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+    Other: `<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+  };
+  return icons[cat] || icons.Other;
+}
+
+function itemCardHTML(item) {
+  const d = daysUntil(item.renewalDate);
+  const s = statusOf(item);
+  const sc = statusClass(s);
+  const sl = statusLabel(s);
+  const daysText = d < 0 ? `<b>Overdue</b> by ${Math.abs(d)} day${Math.abs(d)===1?'':'s'}` : `<b>${d} day${d===1?'':'s'}</b> remaining`;
+  const cycleLabel = item.cycle === 'monthly' ? '/mo' : '/yr';
+  const costStr = fmtMoney(item.cost);
+
+  return `<div class="item" data-id="${esc(item.id)}">
+    <span class="cat-tile">${categoryIcon(item.category)}</span>
+    <div class="main">
+      <div class="top">
+        <span class="nm">${esc(item.name)}</span>
+        <span class="cost">${esc(costStr)}<small>${esc(cycleLabel)}</small></span>
+      </div>
+      <div class="meta">
+        <span class="tag">${esc(item.category)}</span>
+        <span class="dot-sep">·</span>
+        <span class="date-meta">Renews ${formatDate(item.renewalDate)}</span>
+      </div>
+      <div class="foot">
+        <span class="days">${daysText}</span>
+        <span class="status ${sc}"><span class="sdot"></span>${esc(sl)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ============================================================
+   RENEWALS
+   ============================================================ */
+let filterCat    = 'All';
+let filterStatus = 'All';
+let sortMode     = 'date'; // 'date' | 'cost'
+
+function renderRenewals() {
+  const sorted = applyRenewalsSort(applyRenewalsFilter(items));
+  document.getElementById('ren-sub').textContent = `${items.length} item${items.length!==1?'s':''} · ${sortMode === 'date' ? 'soonest first' : 'highest cost first'}`;
+
+  const list = document.getElementById('ren-list');
+  const noResults = document.getElementById('no-results');
+
+  if (sorted.length === 0) {
+    list.innerHTML = '';
+    noResults.classList.add('show');
+  } else {
+    noResults.classList.remove('show');
+    list.innerHTML = sorted.map(item => renewalRowHTML(item)).join('');
+    list.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        openForm(btn.dataset.id);
+      });
+    });
+  }
+}
+
+function applyRenewalsFilter(list) {
+  return list.filter(item => {
+    if (filterCat !== 'All' && item.category !== filterCat) return false;
+    if (filterStatus !== 'All' && statusOf(item) !== filterStatus) return false;
+    return true;
+  });
+}
+
+function applyRenewalsSort(list) {
+  return [...list].sort((a,b) => {
+    if (sortMode === 'date') return a.renewalDate.localeCompare(b.renewalDate);
+    return annualCost(b) - annualCost(a);
+  });
+}
+
+function renewalRowHTML(item) {
+  const d = daysUntil(item.renewalDate);
+  const s = statusOf(item);
+  let daysText, daysClass;
+  if (d < 0)  { daysText = `Overdue ${Math.abs(d)}d`; daysClass = 'over'; }
+  else if (s === 'due7')  { daysText = `${d} day${d===1?'':'s'}`; daysClass = 'd7'; }
+  else if (s === 'due30') { daysText = `${d} days`; daysClass = 'd30'; }
+  else { daysText = `${d} days`; daysClass = ''; }
+
+  const cycleLabel = item.cycle === 'monthly' ? '/mo' : '/yr';
+  const rc = rowStatusClass(s);
+
+  return `<div class="rrow ${rc}">
+    <div class="rmain">
+      <div class="rtop"><span class="rnm">${esc(item.name)}</span><span class="tag">${esc(item.category)}</span></div>
+      <div class="rmeta">${formatDate(item.renewalDate)} <span class="dot-sep">·</span> <span class="rdays ${daysClass}">${esc(daysText)}</span></div>
+    </div>
+    <div class="rright">
+      <span class="rcost">${esc(fmtMoney(item.cost))}<small>${esc(cycleLabel)}</small></span>
+      <span class="edit-btn" data-id="${esc(item.id)}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      </span>
+    </div>
+  </div>`;
+}
+
+// filter pills
+document.getElementById('filter-cat').addEventListener('click', e => {
+  const pill = e.target.closest('.fpill');
+  if (!pill) return;
+  filterCat = pill.dataset.val;
+  document.querySelectorAll('#filter-cat .fpill').forEach(p => p.classList.toggle('on', p === pill));
+  renderRenewals();
+});
+
+document.getElementById('filter-status').addEventListener('click', e => {
+  const pill = e.target.closest('.fpill');
+  if (!pill) return;
+  filterStatus = pill.dataset.val;
+  document.querySelectorAll('#filter-status .fpill').forEach(p => p.classList.toggle('on', p === pill));
+  renderRenewals();
+});
+
+document.getElementById('sort-toggle').addEventListener('click', () => {
+  sortMode = sortMode === 'date' ? 'cost' : 'date';
+  document.getElementById('sort-label-inner').textContent = sortMode === 'date' ? 'Date ↑' : 'Cost ↓';
+  document.getElementById('sort-label').textContent = sortMode === 'date' ? 'Sorted by date' : 'Sorted by cost';
+  renderRenewals();
+});
+
+document.getElementById('clear-filters').addEventListener('click', () => {
+  filterCat = 'All'; filterStatus = 'All';
+  document.querySelectorAll('#filter-cat .fpill').forEach(p => p.classList.toggle('on', p.dataset.val === 'All'));
+  document.querySelectorAll('#filter-status .fpill').forEach(p => p.classList.toggle('on', p.dataset.val === 'All'));
+  renderRenewals();
+});
+
+/* ============================================================
+   INSIGHTS
+   ============================================================ */
+const CAT_COLORS = {
+  SaaS:      'var(--blue-600)',
+  Contract:  'var(--blue-400)',
+  Insurance: 'var(--blue-300)',
+  License:   'var(--accent-dark)',
+  Domain:    'var(--blue-200)',
+  Other:     'var(--blue-100)',
+};
+const CAT_COLOR_RAW = {
+  SaaS:      '#2E5C81',
+  Contract:  '#7FA8C4',
+  Insurance: '#A8C3D6',
+  License:   '#4F86AD',
+  Domain:    '#DCE9F1',
+  Other:     '#EDF3F8',
+};
+
+function renderInsights() {
+  const totalMonthly = items.reduce((s,i) => s + monthlyCost(i), 0);
+  const totalAnnual  = items.reduce((s,i) => s + annualCost(i), 0);
+  const now = new Date();
+  const thisMonthCount = items.filter(i => {
+    const rd = parseDate(i.renewalDate);
+    return rd.getFullYear() === now.getFullYear() && rd.getMonth() === now.getMonth();
+  }).length;
+
+  document.getElementById('ins-monthly').innerHTML  = fmtMoneyHtml(totalMonthly);
+  document.getElementById('ins-annual').innerHTML   = fmtMoneyHtml(totalAnnual, true);
+  document.getElementById('ins-active').textContent  = items.length;
+  document.getElementById('ins-thismonth').textContent = thisMonthCount;
+
+  // donut
+  const byCategory = {};
+  items.forEach(i => {
+    byCategory[i.category] = (byCategory[i.category]||0) + annualCost(i);
+  });
+  const catEntries = Object.entries(byCategory).sort((a,b) => b[1]-a[1]);
+  let conic = '';
+  let acc = 0;
+  catEntries.forEach(([cat, val]) => {
+    const pct = totalAnnual > 0 ? val / totalAnnual * 100 : 0;
+    conic += `${CAT_COLORS[cat]||CAT_COLORS.Other} ${acc.toFixed(1)}% ${(acc+pct).toFixed(1)}%, `;
+    acc += pct;
+  });
+  conic = conic.replace(/, $/, '');
+  const donut = document.getElementById('ins-donut');
+  donut.style.background = `conic-gradient(${conic})`;
+  document.getElementById('ins-donut-total').textContent = fmtMoney(totalAnnual, true);
+
+  const legend = document.getElementById('ins-legend');
+  legend.innerHTML = catEntries.map(([cat, val]) => {
+    const pct = totalAnnual > 0 ? Math.round(val / totalAnnual * 100) : 0;
+    return `<div class="leg">
+      <span class="sw" style="background:${CAT_COLORS[cat]||CAT_COLORS.Other}"></span>
+      <span class="lname">${esc(cat)}</span>
+      <span class="lpct">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  // bar chart — next 12 months from today
+  const barsEl = document.getElementById('ins-bars');
+  const months = [];
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleDateString('en-US',{month:'short'}) });
+  }
+  const monthTotals = months.map(m => {
+    return items.filter(i => {
+      const rd = parseDate(i.renewalDate);
+      return rd.getFullYear() === m.year && rd.getMonth() === m.month;
+    }).reduce((s, i) => s + annualCost(i), 0);
+  });
+  const maxMonth = Math.max(...monthTotals, 1);
+  const currentMonth = now.getMonth();
+  barsEl.innerHTML = months.map((m, idx) => {
+    const h = Math.round(monthTotals[idx] / maxMonth * 100);
+    const isHot = m.month === currentMonth;
+    return `<div class="bar-col">
+      <div class="bar ${isHot?'hot':''}" style="height:${Math.max(h,3)}%"></div>
+      <div class="bar-lbl">${esc(m.label)}</div>
+    </div>`;
+  }).join('');
+
+  // top 5
+  const sorted = [...items].sort((a,b) => annualCost(b) - annualCost(a)).slice(0,5);
+  document.getElementById('ins-top5').innerHTML = sorted.map((item, idx) =>
+    `<div class="rank">
+      <span class="pos">${idx+1}</span>
+      <div class="rmain"><div class="rnm">${esc(item.name)}</div><div class="rmeta">${esc(item.category)}</div></div>
+      <span class="rcost">${esc(fmtMoney(annualCost(item)))}<small>/yr</small></span>
+    </div>`
+  ).join('');
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+let editingId = null;
+
+function openForm(itemId) {
+  formReturnTab = currentTab;
+  editingId = itemId || null;
+
+  const item = itemId ? items.find(i => i.id === itemId) : null;
+
+  document.getElementById('form-title').textContent = item ? 'Edit subscription' : 'New subscription';
+  document.getElementById('form-sub').textContent   = item
+    ? `Renews ${formatDate(item.renewalDate)} · ${daysLabel(daysUntil(item.renewalDate))}`
+    : 'Add a contract, tool or license';
+
+  document.getElementById('f-name').value  = item ? item.name  : '';
+  document.getElementById('f-cost').value  = item ? item.cost  : '';
+  document.getElementById('f-date').value  = item ? item.renewalDate : '';
+  document.getElementById('f-notes').value = item ? item.notes : '';
+
+  // category chips
+  document.querySelectorAll('.cat-chip').forEach(chip => {
+    chip.classList.toggle('on', item ? chip.dataset.cat === item.category : false);
+  });
+
+  // billing cycle
+  const wantCycle = item ? item.cycle : 'monthly';
+  document.querySelectorAll('.seg .opt').forEach(opt => {
+    opt.classList.toggle('on', opt.dataset.cycle === wantCycle);
+  });
+
+  // delete button
+  const deleteWrap = document.getElementById('f-delete-wrap');
+  if (item) {
+    deleteWrap.innerHTML = `<div class="delete-btn" id="form-delete">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      Delete subscription
+    </div>`;
+    document.getElementById('form-delete').addEventListener('click', () => {
+      deleteWrap.innerHTML = `<div class="delete-confirm">
+        <p>Delete <strong>${esc(item.name)}</strong>? This can't be undone.</p>
+        <div class="dc-btns">
+          <span class="dc-cancel" id="dc-cancel">Keep it</span>
+          <span class="dc-yes" id="dc-yes">Yes, delete</span>
+        </div>
+      </div>`;
+      document.getElementById('dc-cancel').addEventListener('click', () => openForm(itemId));
+      document.getElementById('dc-yes').addEventListener('click', () => {
+        items = items.filter(i => i.id !== itemId);
+        saveItems(items);
+        closeForm();
+      });
+    });
+  } else {
+    deleteWrap.innerHTML = '';
+  }
+
+  // clear errors
+  document.getElementById('f-name').classList.remove('err');
+  document.getElementById('f-cost').classList.remove('err');
+  document.getElementById('f-date').classList.remove('err');
+
+  showScreen('scr-form');
+}
+
+function daysLabel(d) {
+  if (d < 0) return `Overdue ${Math.abs(d)}d`;
+  if (d === 0) return 'Today';
+  return `${d} day${d===1?'':'s'}`;
+}
+
+function closeForm() {
+  goTab(formReturnTab);
+}
+
+document.getElementById('form-back').addEventListener('click', closeForm);
+document.getElementById('form-cancel').addEventListener('click', closeForm);
+
+document.getElementById('form-save').addEventListener('click', () => {
+  const name = document.getElementById('f-name').value.trim();
+  const costRaw = document.getElementById('f-cost').value;
+  const cost = parseFloat(costRaw);
+  const date = document.getElementById('f-date').value;
+
+  let valid = true;
+  document.getElementById('f-name').classList.remove('err');
+  document.getElementById('f-cost').classList.remove('err');
+  document.getElementById('f-date').classList.remove('err');
+
+  if (!name) { document.getElementById('f-name').classList.add('err'); valid = false; }
+  if (!costRaw || isNaN(cost) || cost < 0) { document.getElementById('f-cost').classList.add('err'); valid = false; }
+  if (!date) { document.getElementById('f-date').classList.add('err'); valid = false; }
+  if (!valid) return;
+
+  const selectedCat = [...document.querySelectorAll('.cat-chip')].find(c => c.classList.contains('on'));
+  const category = selectedCat ? selectedCat.dataset.cat : 'Other';
+  const selectedCycle = [...document.querySelectorAll('.seg .opt')].find(o => o.classList.contains('on'));
+  const cycle = selectedCycle ? selectedCycle.dataset.cycle : 'monthly';
+  const notes = document.getElementById('f-notes').value.trim();
+
+  if (editingId) {
+    const idx = items.findIndex(i => i.id === editingId);
+    if (idx !== -1) {
+      items[idx] = { ...items[idx], name, category, cost, cycle, renewalDate:date, notes };
+    }
+  } else {
+    const id = String(Date.now()) + String(Math.floor(Math.random() * 10000));
+    items.push({ id, name, category, cost, cycle, renewalDate:date, notes });
+  }
+
+  saveItems(items);
+  closeForm();
+});
+
+// category chip selection
+document.getElementById('f-cat-grid').addEventListener('click', e => {
+  const chip = e.target.closest('.cat-chip');
+  if (!chip) return;
+  document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('on'));
+  chip.classList.add('on');
+});
+
+// billing cycle toggle
+document.getElementById('f-cycle').addEventListener('click', e => {
+  const opt = e.target.closest('.opt');
+  if (!opt) return;
+  document.querySelectorAll('.seg .opt').forEach(o => o.classList.remove('on'));
+  opt.classList.add('on');
+});
+
+/* ============================================================
+   TAB BAR (all tab bars)
+   ============================================================ */
+document.querySelectorAll('.tab[data-tab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    goTab(tab.dataset.tab);
+    // update all tab bars
+    document.querySelectorAll('.tab[data-tab]').forEach(t => {
+      t.classList.toggle('active', t.dataset.tab === tab.dataset.tab);
+    });
+  });
+});
+
+/* ============================================================
+   FAB
+   ============================================================ */
+document.getElementById('fab-add').addEventListener('click', () => openForm(null));
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderHome();
+</script>
+</body>
+</html>
