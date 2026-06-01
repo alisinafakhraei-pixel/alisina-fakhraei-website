@@ -704,31 +704,25 @@
           <div class="card-thumb" style="background:#EEF4F8;padding:0;align-items:stretch;">
             <svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;">
               <rect width="360" height="200" fill="#EEF4F8"/>
-              <rect x="20" y="16" width="96" height="28" rx="8" fill="#fff" stroke="#A8C3D6" stroke-width="0.8"/>
-              <text x="68" y="27" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="#9A9A9A" text-anchor="middle">Your salary</text>
-              <text x="68" y="38" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#0A0A0A" text-anchor="middle">$50,000/yr</text>
-              <rect x="126" y="16" width="96" height="28" rx="8" fill="#fff" stroke="#A8C3D6" stroke-width="0.8"/>
-              <text x="174" y="27" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="#9A9A9A" text-anchor="middle">Hourly rate</text>
-              <text x="174" y="38" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#0A0A0A" text-anchor="middle">$24.04</text>
-              <rect x="232" y="16" width="108" height="28" rx="8" fill="#6B9AB8"/>
-              <text x="286" y="27" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="rgba(255,255,255,0.75)" text-anchor="middle">Item price</text>
-              <text x="286" y="38" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">$299.00</text>
-              <rect x="20" y="54" width="152" height="38" rx="10" fill="#fff" stroke="#A8C3D6" stroke-width="0.6"/>
-              <rect x="20" y="54" width="3.5" height="38" rx="2" fill="#A8C3D6"/>
-              <text x="35" y="68" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="#9A9A9A">Item price</text>
-              <text x="35" y="83" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#0A0A0A">$299</text>
-              <text x="187" y="78" font-family="system-ui,sans-serif" font-size="18" font-weight="300" fill="#A8C3D6" text-anchor="middle">→</text>
-              <rect x="201" y="54" width="139" height="38" rx="10" fill="#6B9AB8"/>
-              <text x="271" y="68" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="rgba(255,255,255,0.7)" text-anchor="middle">of your life</text>
-              <text x="271" y="83" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">12.4 hrs</text>
-              <rect x="20" y="102" width="320" height="38" rx="10" fill="#fff" stroke="#A8C3D6" stroke-width="0.6"/>
-              <rect x="20" y="102" width="3.5" height="38" rx="2" fill="#6B9AB8"/>
-              <text x="35" y="117" font-family="system-ui,sans-serif" font-size="7" font-weight="500" fill="#9A9A9A">Thinking in hours, not dollars</text>
-              <text x="35" y="131" font-family="system-ui,sans-serif" font-size="9" font-weight="600" fill="#484848">Is 12 hours of your time worth a MacBook?</text>
-              <rect x="20" y="150" width="152" height="34" rx="10" fill="#fff" stroke="#A8C3D6" stroke-width="0.6"/>
-              <text x="96" y="172" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#38b27a" text-anchor="middle">✓ Worth it</text>
-              <rect x="188" y="150" width="152" height="34" rx="10" fill="#EEF4F8" stroke="#A8C3D6" stroke-width="0.6"/>
-              <text x="264" y="172" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#9A9A9A" text-anchor="middle">✕ Skip it</text>
+              <!-- salary context bar — single slim pill -->
+              <rect x="20" y="14" width="320" height="24" rx="7" fill="#fff" stroke="#A8C3D6" stroke-width="0.6"/>
+              <text x="180" y="30" font-family="system-ui,sans-serif" font-size="9" font-weight="500" fill="#9A9A9A" text-anchor="middle">Salary $50,000/yr  ·  $24.04/hr</text>
+              <!-- central white card -->
+              <rect x="20" y="46" width="320" height="100" rx="14" fill="#fff" stroke="#A8C3D6" stroke-width="0.8"/>
+              <!-- "that costs you" label -->
+              <text x="180" y="66" font-family="system-ui,sans-serif" font-size="9" font-weight="500" fill="#9A9A9A" text-anchor="middle">That $299 MacBook Pro costs you</text>
+              <!-- big hour number -->
+              <text x="148" y="116" font-family="system-ui,sans-serif" font-size="52" font-weight="800" fill="#6B9AB8" text-anchor="end" letter-spacing="-2">12.4</text>
+              <text x="154" y="105" font-family="system-ui,sans-serif" font-size="16" font-weight="600" fill="#0A0A0A">hrs</text>
+              <text x="154" y="121" font-family="system-ui,sans-serif" font-size="10" font-weight="400" fill="#9A9A9A">of your life</text>
+              <!-- thin divider -->
+              <line x1="40" y1="132" x2="320" y2="132" stroke="#A8C3D6" stroke-width="0.5" opacity="0.6"/>
+              <text x="180" y="143" font-family="system-ui,sans-serif" font-size="8.5" font-weight="500" fill="#9A9A9A" text-anchor="middle">at your current hourly rate</text>
+              <!-- bottom decision buttons -->
+              <rect x="20" y="156" width="152" height="32" rx="9" fill="#fff" stroke="#A8C3D6" stroke-width="0.6"/>
+              <text x="96" y="176" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#38b27a" text-anchor="middle">✓  Worth it</text>
+              <rect x="188" y="156" width="152" height="32" rx="9" fill="#EEF4F8" stroke="#A8C3D6" stroke-width="0.6"/>
+              <text x="264" y="176" font-family="system-ui,sans-serif" font-size="10" font-weight="600" fill="#9A9A9A" text-anchor="middle">✕  Skip it</text>
             </svg>
           </div>
           <div class="card-body">
