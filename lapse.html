@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lapse — Renewal Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -190,7 +190,7 @@ html, body{
 /* tab bar */
 .tabbar{
   flex-shrink:0; display:flex; align-items:center; justify-content:space-around;
-  padding:10px 14px 22px; border-top:0.5px solid var(--border);
+  padding:10px 14px calc(22px + env(safe-area-inset-bottom, 0px)); border-top:0.5px solid var(--border);
   background:rgba(255,255,255,0.92); backdrop-filter:saturate(180%) blur(16px);
   position:absolute; bottom:0; left:0; right:0; z-index:4;
 }
@@ -378,9 +378,9 @@ input[type="date"].input::-webkit-calendar-picker-indicator{
 /* validation error */
 .input.err{ border-color:var(--danger); }
 
-/* scrollable screens use padding-bottom for tab bar */
+/* scrollable screens use padding-bottom for tab bar + safe area */
 .screen-home .body, .screen-renewals .body, .screen-insights .body{
-  padding-bottom:80px;
+  padding-bottom:calc(80px + env(safe-area-inset-bottom, 0px));
 }
 </style>
 </head>
