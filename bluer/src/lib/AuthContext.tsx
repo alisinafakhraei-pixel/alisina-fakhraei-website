@@ -1,80 +1,78 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
-
-type AuthUser = { phone: string; name: string }
-type AuthStore = { users: Record<string, string>; current: AuthUser | null; isNew: boolean }
-
-function load(): AuthStore {
-  try {
-    const raw = localStorage.getItem("bluer-auth")
-    if (raw) return JSON.parse(raw)
-  } catch { /* ignore */ }
-  return { users: {}, current: null, isNew: false }
-}
-
-function save(store: AuthStore) {
-  try { localStorage.setItem("bluer-auth", JSON.stringify(store)) } catch { /* ignore */ }
-}
+import { supabase } from "./supabase"
+import type { User } from "@supabase/supabase-js"
 
 type AuthCtx = {
-  user: AuthUser | null
+  user: User | null
   isLoggedIn: boolean
   isNew: boolean
   hydrated: boolean
-  signUp: (phone: string, password: string, name: string) => string | null
-  logIn: (phone: string, password: string) => string | null
-  logOut: () => void
+  signUp: (phone: string, password: string, name: string) => Promise<string | null>
+  logIn: (phone: string, password: string) => Promise<string | null>
+  logOut: () => Promise<void>
   completeOnboarding: () => void
 }
 
 const AuthContext = createContext<AuthCtx | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [store, setStore] = useState<AuthStore>({ users: {}, current: null, isNew: false })
+  const [user, setUser] = useState<User | null>(null)
   const [hydrated, setHydrated] = useState(false)
+  const [isNew, setIsNew] = useState(false)
 
   useEffect(() => {
-    setStore(load())
-    setHydrated(true)
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null)
+      setHydrated(true)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
   }, [])
 
-  function signUp(phone: string, password: string, name: string): string | null {
-    const s = load()
-    if (s.users[phone]) return "Phone already registered"
-    const next: AuthStore = { users: { ...s.users, [phone]: password }, current: { phone, name }, isNew: true }
-    save(next)
-    setStore(next)
+  async function signUp(phone: string, password: string, name: string): Promise<string | null> {
+    // Use phone as email (format: phone@bluer.app) since Supabase email auth is simplest
+    const email = `${phone.replace(/\s+/g, "")}@bluer.app`
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) return error.message
+    if (data.user) {
+      await supabase.from("profiles").upsert({
+        id: data.user.id,
+        phone,
+        name,
+        avatar_color: "#3b82f6",
+        display_name: name,
+        email,
+      })
+      setIsNew(true)
+    }
     return null
   }
 
-  function logIn(phone: string, password: string): string | null {
-    const s = load()
-    if (!s.users[phone]) return "Phone not found"
-    if (s.users[phone] !== password) return "Wrong password"
-    const next: AuthStore = { ...s, current: { phone, name: phone }, isNew: false }
-    save(next)
-    setStore(next)
+  async function logIn(phone: string, password: string): Promise<string | null> {
+    const email = `${phone.replace(/\s+/g, "")}@bluer.app`
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return "Phone or password incorrect"
     return null
   }
 
-  function logOut() {
-    const s = load()
-    save({ ...s, current: null })
-    setStore({ ...s, current: null })
+  async function logOut() {
+    await supabase.auth.signOut()
+    setIsNew(false)
   }
 
   function completeOnboarding() {
-    const s = load()
-    save({ ...s, isNew: false })
-    setStore({ ...s, isNew: false })
+    setIsNew(false)
   }
 
   return (
     <AuthContext.Provider value={{
-      user: store.current,
-      isLoggedIn: !!store.current,
-      isNew: store.isNew,
+      user,
+      isLoggedIn: !!user,
+      isNew,
       hydrated,
       signUp, logIn, logOut, completeOnboarding,
     }}>

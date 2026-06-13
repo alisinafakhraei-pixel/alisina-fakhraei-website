@@ -22,19 +22,17 @@ export function AuthModal() {
     setPhone(""); setName(""); setPassword(""); setError(""); setShowPw(false); setMode(next)
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     setError("")
     if (!phone.trim() || !password.trim()) { setError("Fill in all fields"); return }
     if (mode === "signup" && !name.trim()) { setError("Enter your name"); return }
     if (password.length < 4) { setError("Password must be at least 4 characters"); return }
     setLoading(true)
-    setTimeout(() => {
-      const err = mode === "signup"
-        ? signUp(phone.trim(), password, name.trim())
-        : logIn(phone.trim(), password)
-      setLoading(false)
-      if (err) setError(err)
-    }, 500)
+    const err = mode === "signup"
+      ? await signUp(phone.trim(), password, name.trim())
+      : await logIn(phone.trim(), password)
+    setLoading(false)
+    if (err) setError(err)
   }
 
   /* ── Idle banner ─────────────────────────────────────────────────── */
