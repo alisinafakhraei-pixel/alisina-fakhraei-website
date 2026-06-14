@@ -5,35 +5,28 @@ import { Input } from "@/components/ui/input"
 import { UserCard } from "@/components/UserCard"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { BottomNav } from "@/components/BottomNav"
-import { SOCIAL_USERS, INITIALLY_FOLLOWED } from "@/lib/social-data"
+import { useSocialUsers, useFollows } from "@/lib/useSocial"
 import { Search, Users } from "lucide-react"
 
 export default function SearchPage() {
   const [query, setQuery] = useState("")
-  const [followed, setFollowed] = useState<Set<string>>(new Set(INITIALLY_FOLLOWED))
   const [focused, setFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  function toggleFollow(id: string) {
-    setFollowed((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
+  const { users, loading } = useSocialUsers()
+  const { following, toggleFollow } = useFollows()
 
   const q = query.trim().toLowerCase()
-  const followedUsers = SOCIAL_USERS.filter((u) => followed.has(u.id))
+  const followedUsers = users.filter((u) => following.has(u.id))
   const searchResults = q
-    ? SOCIAL_USERS.filter(
+    ? users.filter(
         (u) =>
-          !followed.has(u.id) &&
+          !following.has(u.id) &&
           (u.name.toLowerCase().includes(q) ||
-            u.username.toLowerCase().includes(q) ||
-            u.bio.toLowerCase().includes(q))
+            (u.username ?? "").toLowerCase().includes(q) ||
+            (u.bio ?? "").toLowerCase().includes(q))
       )
-    : SOCIAL_USERS.filter((u) => !followed.has(u.id))
+    : users.filter((u) => !following.has(u.id))
 
   const showResults = q.length > 0 || focused
 
@@ -69,15 +62,27 @@ export default function SearchPage() {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-1">
               {q ? "Results" : "Discover Traders"}
             </p>
-            {searchResults.length === 0 ? (
+            {loading ? (
+              <p className="text-sm text-muted-foreground text-center py-6">Loading…</p>
+            ) : searchResults.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">No traders found</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {searchResults.map((user, i) => (
                   <UserCard
                     key={user.id}
-                    user={user}
-                    followed={followed.has(user.id)}
+                    user={{
+                      id: user.id,
+                      username: user.username ?? user.id,
+                      name: user.display_name ?? user.name,
+                      bio: user.bio ?? "",
+                      avatarColor: user.avatar_color ?? "#3b82f6",
+                      avatarInitials: (user.display_name ?? user.name).split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2),
+                      followersCount: user.followers_count,
+                      followingCount: user.following_count,
+                      coins: [],
+                    }}
+                    followed={following.has(user.id)}
                     onToggleFollow={toggleFollow}
                     delay={i}
                   />
@@ -106,7 +111,17 @@ export default function SearchPage() {
                 {followedUsers.map((user, i) => (
                   <UserCard
                     key={user.id}
-                    user={user}
+                    user={{
+                      id: user.id,
+                      username: user.username ?? user.id,
+                      name: user.display_name ?? user.name,
+                      bio: user.bio ?? "",
+                      avatarColor: user.avatar_color ?? "#3b82f6",
+                      avatarInitials: (user.display_name ?? user.name).split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2),
+                      followersCount: user.followers_count,
+                      followingCount: user.following_count,
+                      coins: [],
+                    }}
                     followed={true}
                     onToggleFollow={toggleFollow}
                     delay={i}

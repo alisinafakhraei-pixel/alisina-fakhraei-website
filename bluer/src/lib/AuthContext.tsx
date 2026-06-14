@@ -34,15 +34,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   async function signUp(phone: string, password: string, name: string): Promise<string | null> {
-    // Use phone as email (format: phone@bluer.app) since Supabase email auth is simplest
     const email = `${phone.replace(/\s+/g, "")}@bluer.app`
     const { data, error } = await supabase.auth.signUp({ email, password })
     if (error) return error.message
     if (data.user) {
+      const base = name.toLowerCase().replace(/[^a-z0-9]/g, "")
+      const username = `${base}${Math.floor(1000 + Math.random() * 9000)}`
       await supabase.from("profiles").upsert({
         id: data.user.id,
         phone,
         name,
+        username,
         avatar_color: "#3b82f6",
         display_name: name,
         email,

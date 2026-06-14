@@ -3,38 +3,13 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 
-type Step = {
-  target: string
-  title: string
-  description: string
-  emoji: string
-}
+type Step = { target: string; title: string; description: string; emoji: string }
 
 const STEPS: Step[] = [
-  {
-    target: "buy",
-    title: "Add your first trade",
-    description: "Tap Buy to record a new position. Your portfolio value updates instantly.",
-    emoji: "💸",
-  },
-  {
-    target: "chart",
-    title: "Watch your portfolio grow",
-    description: "This chart tracks your total value over time with live prices from Wallex.",
-    emoji: "📈",
-  },
-  {
-    target: "profile",
-    title: "Make it yours",
-    description: "Set your name, pick a color, and generate a shareable portfolio card.",
-    emoji: "✨",
-  },
-  {
-    target: "social",
-    title: "Follow top traders",
-    description: "See what the best traders are holding and benchmark your performance.",
-    emoji: "🤝",
-  },
+  { target: "buy",     title: "Add your first trade",       description: "Tap Buy to record a new position. Your portfolio value updates instantly.",                  emoji: "💸" },
+  { target: "chart",   title: "Watch your portfolio grow",  description: "This chart tracks your total value over time with live prices from Wallex.",                 emoji: "📈" },
+  { target: "profile", title: "Make it yours",              description: "Set your name, pick a color, and generate a shareable portfolio card.",                       emoji: "✨" },
+  { target: "social",  title: "Follow top traders",         description: "See what the best traders are holding and benchmark your performance.",                       emoji: "🤝" },
 ]
 
 type Props = { onComplete: () => void }
@@ -57,7 +32,6 @@ export function OnboardingTour({ onComplete }: Props) {
       ;(best as Element).scrollIntoView({ behavior: "smooth", block: "nearest" })
       setTimeout(() => setRect((best as Element).getBoundingClientRect()), 300)
     }
-
     setRect(null)
     const t = setTimeout(measure, 100)
     return () => clearTimeout(t)
@@ -69,10 +43,14 @@ export function OnboardingTour({ onComplete }: Props) {
   }
 
   const PAD = 10
+  const vh = typeof window !== "undefined" ? window.innerHeight : 844
+
+  // If spotlight is in the bottom 50% of screen, put tooltip at top
+  const tooltipAtTop = rect ? rect.top > vh * 0.45 : false
 
   return (
     <>
-      {/* Dark overlay + spotlight hole via box-shadow trick */}
+      {/* Spotlight hole via box-shadow */}
       {rect && (
         <div
           className="fixed z-40 rounded-2xl transition-all duration-300"
@@ -81,7 +59,7 @@ export function OnboardingTour({ onComplete }: Props) {
             left: rect.left - PAD,
             width: rect.width + PAD * 2,
             height: rect.height + PAD * 2,
-            boxShadow: "0 0 0 9999px rgba(0,0,0,0.62)",
+            boxShadow: "0 0 0 9999px rgba(0,0,0,0.65)",
             outline: "2.5px solid rgba(99,102,241,0.9)",
             outlineOffset: 2,
             pointerEvents: "none",
@@ -89,11 +67,12 @@ export function OnboardingTour({ onComplete }: Props) {
         />
       )}
 
-      {/* Tooltip — always fixed at bottom, never overlaps spotlight */}
-      <div className="fixed bottom-0 inset-x-0 z-50 flex justify-center px-4 pb-6 pt-2">
+      {/* Tooltip — top or bottom depending on spotlight position */}
+      <div
+        className={`fixed inset-x-0 z-50 flex justify-center px-4 ${tooltipAtTop ? "top-0 pt-4" : "bottom-0 pb-6"}`}
+      >
         <div className="w-full max-w-sm bg-card border border-border rounded-2xl shadow-2xl p-4 space-y-3 animate-slide-up">
 
-          {/* Progress dots */}
           <div className="flex items-center justify-between">
             <div className="flex gap-1.5">
               {STEPS.map((_, i) => (
@@ -117,9 +96,7 @@ export function OnboardingTour({ onComplete }: Props) {
           </div>
 
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="text-xs h-9 px-4" onClick={onComplete}>
-              Skip
-            </Button>
+            <Button variant="ghost" size="sm" className="text-xs h-9 px-4" onClick={onComplete}>Skip</Button>
             <Button size="sm" className="flex-1 h-9 text-xs font-semibold" onClick={next}>
               {step === STEPS.length - 1 ? "Let's go 🚀" : "Next →"}
             </Button>
