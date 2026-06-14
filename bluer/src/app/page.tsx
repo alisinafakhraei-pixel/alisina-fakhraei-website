@@ -41,8 +41,9 @@ export default function Home() {
   const { isLoggedIn, isNew, hydrated, completeOnboarding } = useAuth()
   const { transactions, addTransaction } = useTransactions()
 
-  // Live prices from Wallex
-  const allSymbols = Object.keys(COIN_META)
+  // Live prices from Wallex — pass uppercase symbols (BTC, ETH…) as WALLEX_SYMBOL keys are uppercase
+  const allCoinIds = Object.keys(COIN_META)
+  const allSymbols = allCoinIds.map((id) => COIN_META[id].symbol)
   const livePrices = useWallexPrices(allSymbols)
 
   function getLivePrice(coinId: string): number {
@@ -54,14 +55,14 @@ export default function Home() {
 
   // Build live prices map for modal (coinId → price)
   const livePriceById: Record<string, number> = {}
-  for (const id of allSymbols) {
+  for (const id of allCoinIds) {
     const p = getLivePrice(id)
     if (p > 0) livePriceById[id] = p
   }
 
   // Derive portfolio from real transactions
   const fallbackPrices: Record<string, number> = {}
-  for (const id of allSymbols) {
+  for (const id of allCoinIds) {
     const p = getLivePrice(id)
     if (p > 0) fallbackPrices[id] = p
   }
@@ -229,8 +230,8 @@ export default function Home() {
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest px-1">Your Coins</p>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
               {coins.map((coin, idx) => {
-                const ws = WALLEX_SYMBOL[coin.symbol]
-                const lp = ws ? livePrices.get(ws)?.price : undefined
+                const wallexSym = WALLEX_SYMBOL[coin.symbol]
+                const lp = wallexSym ? livePrices.get(wallexSym)?.price : undefined
                 return <CoinCard key={coin.id} coin={coin} delay={idx} livePrice={lp} />
               })}
             </div>
