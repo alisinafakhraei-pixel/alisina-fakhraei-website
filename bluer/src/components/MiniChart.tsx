@@ -13,11 +13,12 @@ function tagX(dotX: number, tagW: number, W: number) {
   return Math.max(half + 2, Math.min(W - half - 2, dotX))
 }
 
-export function MiniChart({ height = 96 }: { height?: number }) {
+export function MiniChart({ height = 96, data }: { height?: number; data?: {date: string; value: number}[] }) {
   const clipRef = useRef<SVGRectElement>(null)
 
-  const values = CHART_DATA.map((d) => d.value)
-  const labels = CHART_DATA.map((d) => d.date)
+  const source = (data && data.length >= 2) ? data : CHART_DATA
+  const values = source.map((d) => d.value)
+  const labels = source.map((d) => d.date)
   const min = Math.min(...values)
   const max = Math.max(...values)
   const minIdx = values.indexOf(min)

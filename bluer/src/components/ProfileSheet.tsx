@@ -67,6 +67,9 @@ export function ProfileSheet({ open, onClose, onShare }: Props) {
                 {previewInitials}
               </div>
               <p className="text-xs text-muted-foreground">Your avatar updates as you type</p>
+              {profile.username && (
+                <p className="text-xs font-mono text-muted-foreground">@{profile.username}</p>
+              )}
             </div>
 
             {/* Name input */}

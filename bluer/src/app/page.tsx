@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MiniChart } from "@/components/MiniChart"
@@ -47,6 +47,7 @@ export default function Home() {
   const livePrices = useWallexPrices(allSymbols)
 
   function getLivePrice(coinId: string): number {
+    if (coinId === 'usdt') return 1.0
     const symbol = COIN_META[coinId]?.symbol
     if (!symbol) return 0
     const ws = WALLEX_SYMBOL[symbol]
@@ -69,6 +70,41 @@ export default function Home() {
   const coins = usePortfolio(transactions, fallbackPrices)
 
   const totalValue = coins.reduce((sum, c) => sum + c.price * c.holdings, 0)
+
+  // Build chart data from transaction history
+  const chartData = useMemo(() => {
+    if (transactions.length === 0) return []
+    const sorted = [...transactions].sort((a, b) => a.date.localeCompare(b.date))
+    const holdings: Record<string, number> = {}
+    const avgPrice: Record<string, number> = {}
+    const buyTotal: Record<string, number> = {}
+    const buyAmt: Record<string, number> = {}
+    const points: {date: string; value: number}[] = []
+    for (const tx of sorted) {
+      const id = tx.coin_id
+      if (!holdings[id]) { holdings[id] = 0; buyTotal[id] = 0; buyAmt[id] = 0; avgPrice[id] = 0 }
+      if (tx.type === 'buy') {
+        holdings[id] += tx.amount
+        buyTotal[id] += tx.total
+        buyAmt[id] += tx.amount
+        avgPrice[id] = buyAmt[id] > 0 ? buyTotal[id] / buyAmt[id] : tx.price_at_time
+      } else {
+        holdings[id] = Math.max(0, holdings[id] - tx.amount)
+      }
+      let value = 0
+      for (const [cid, held] of Object.entries(holdings)) {
+        const price = cid === id ? tx.price_at_time : (avgPrice[cid] ?? 0)
+        value += held * price
+      }
+      const d = new Date(tx.date)
+      const label = d.toLocaleDateString('en-US', {month:'short', day:'numeric'})
+      points.push({date: label, value: Math.round(value * 100) / 100})
+    }
+    if (points.length > 0) {
+      points.push({date: 'Now', value: Math.round(totalValue * 100) / 100})
+    }
+    return points
+  }, [transactions, totalValue])
   const totalPL    = coins.reduce((sum, c) => sum + (c.price - c.avgBuyPrice) * c.holdings, 0)
   const cost       = totalValue - totalPL
   const totalPLPercent = cost > 0 ? (totalPL / cost) * 100 : 0
@@ -147,7 +183,7 @@ export default function Home() {
                 </div>
 
                 <div className="pt-2 lg:pt-3" data-tour="chart">
-                  <MiniChart height={148} />
+                  <MiniChart height={148} data={chartData} />
                 </div>
 
                 <div className="flex gap-3 pt-2 border-t border-border mt-1 cursor-pointer" onClick={() => setShowTransactions(!showTransactions)}>
