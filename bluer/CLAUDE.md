@@ -1,90 +1,167 @@
 # Bluer — Project Reference
 
 ## What This Is
-A mobile-first coin/asset tracker called **bluer**. Prototype only — no backend, all mock data. Tracks crypto + commodities P/L.
+A mobile-first crypto portfolio tracker deployed at **https://bluer.alisinafakhraei.site/**. Real Supabase backend, Wallex live prices, full auth, social features.
 
 ## Dev Commands
 ```bash
-cd bluer
-npm run dev          # http://localhost:3333 (use --port 3333)
+cd "/Users/alisinafakhraei/Documents/[1] Work /[3] Claude/[3] Price tracker/bluer"
+npm run dev          # http://localhost:3333
 npm run build        # production build check
-npx shadcn@latest add <component>   # add shadcn components
+```
+
+## Deploy Flow
+```bash
+# After changes, sync to the website repo and push — Vercel auto-deploys
+rsync -a --exclude='.next' --exclude='node_modules' --exclude='.git' \
+  "/Users/alisinafakhraei/Documents/[1] Work /[3] Claude/[3] Price tracker/bluer/" \
+  "/Users/alisinafakhraei/Documents/[1] Work /[3] Claude/[100] Website design/alisina-fakhraei-website/bluer/"
+
+cd "/Users/alisinafakhraei/Documents/[1] Work /[3] Claude/[100] Website design/alisina-fakhraei-website"
+git add bluer/ && git commit -m "..." && git push
 ```
 
 ## Stack
-- **Next.js 16.2.9** (App Router) — note: this version has breaking changes, always check `node_modules/next/dist/docs/` before writing new Next.js patterns
+- **Next.js 16.2.9** App Router, `"use client"` on all pages
 - **React 19**
-- **Tailwind CSS v4** — uses `@theme inline` and CSS custom properties, NOT the old `tailwind.config.js` pattern
-- **shadcn/ui** — preset `b1au7YpGy`, initialized via `npx shadcn@latest init --preset b1au7YpGy --template next --rtl`
-- **lucide-react** for icons
-- **canvas-confetti** for buy/sell celebration
+- **Tailwind CSS v4** — `@theme inline` in globals.css, no tailwind.config.js
+- **shadcn/ui** — preset `b1au7YpGy`
+- **Supabase** — project ref `erdfgmydfcgdjwvkzvkl`, URL `https://yeslswkxcruvaytljayr.supabase.co`
+- **Wallex WebSocket** — `wss://api.wallex.ir/ws`, proxied via `/api/prices`
+- **Vercel** — root directory: `bluer`, domain: `bluer.alisinafakhraei.site`
 
 ## File Map
 ```
 src/
   app/
-    page.tsx          — home page (hero card, transactions, coins list, buy/sell bar)
-    layout.tsx        — root layout
-    globals.css       — CSS vars, theme tokens, custom keyframes
+    page.tsx                    — portfolio home (hero card, chart, coins grid, buy/sell)
+    layout.tsx                  — root layout with AuthProvider
+    globals.css                 — CSS vars, theme tokens, keyframes
+    api/prices/route.ts         — Wallex REST proxy (CORS workaround)
+    search/page.tsx             — social tab (suggested + following + search)
+    profile/[username]/page.tsx — public profile page (loads from Supabase by username)
   components/
-    CoinCard.tsx      — individual coin card with live price ticking + P/L badge
-    MiniChart.tsx     — SVG line chart with clip-rect draw animation, min/max tags
-    BuySellModal.tsx  — dialog with buy/sell tabs, coin select, amount ↔ USD sync, confetti
-    ThemeToggle.tsx   — dark/light toggle, persists to localStorage
-    ui/               — shadcn primitives (button, card, badge, dialog, input, label, select, sheet, tabs)
+    AuthModal.tsx               — idle banner → expandable login/signup sheet
+    OnboardingTour.tsx          — 4-step tour with box-shadow spotlight + position-aware tooltip
+    BuySellModal.tsx            — buy/sell dialog, coin select, amount↔USD sync, confetti
+    CoinCard.tsx                — coin card with live price tick + P/L badge
+    MiniChart.tsx               — SVG line chart, accepts real data prop, animated draw
+    ProfileSheet.tsx            — edit display name, avatar color, shows @username
+    UserCard.tsx                — full social user card (portfolio value, P/L, coin chips)
+    SocialCoinCard.tsx          — coin card for other users' profiles
+    ShareModal.tsx              — share portfolio as image
+    BottomNav.tsx               — mobile bottom navigation
+    ThemeToggle.tsx             — dark/light toggle
   lib/
-    mock-data.ts      — all mock coins, transactions, chart data, and helper fns
-    utils.ts          — shadcn cn() utility
+    AuthContext.tsx             — React Context, Supabase auth, phone→email trick
+    supabase.ts                 — supabase client + DbTransaction / DbProfile types
+    useTransactions.ts          — fetch/add/delete from bluer_transactions
+    usePortfolio.ts             — derive Coin[] from DbTransaction[], COIN_META
+    useSocial.ts                — useSocialUsers, useFollows, usePublicProfile hooks
+    useProfile.ts               — local profile + Supabase username sync
+    useWallexPrices.ts          — WebSocket + REST seed for live prices
+    wallex.ts                   — WS singleton, WALLEX_SYMBOL map, fetchCurrentPrices
+    mock-data.ts                — Coin/Transaction types, CHART_DATA fallback
+    social-data.ts              — SocialUser type (used by UserCard)
+    utils.ts                    — shadcn cn()
 ```
 
-## Data Model (`mock-data.ts`)
+## Supabase Schema
+
+### `profiles`
+```
+id uuid PK (= auth.users.id)
+phone text
+name text
+username text UNIQUE        — generated on signup: base + 4 random digits
+display_name text
+avatar_color text
+email text
+bio text
+followers_count int default 0
+following_count int default 0
+```
+
+### `bluer_transactions`
+```
+id uuid PK
+user_id uuid FK → profiles.id
+coin_id text          — lowercase key: "btc", "eth", "usdt"…
+coin_symbol text      — uppercase: "BTC", "ETH"…
+type "buy"|"sell"
+amount numeric
+price_at_time numeric
+total numeric
+date date
+created_at timestamptz
+```
+RLS: INSERT/DELETE require `auth.uid() = user_id`; SELECT is public (all portfolios are public).
+
+### `bluer_follows`
+```
+follower_id uuid FK → profiles.id
+following_id uuid FK → profiles.id
+PRIMARY KEY (follower_id, following_id)
+```
+RLS: INSERT/DELETE require `auth.uid() = follower_id`; SELECT is public.
+
+## Coin Support
 ```ts
-Coin { id, symbol, name, price, change24h, holdings, avgBuyPrice, color }
-Transaction { id, coinId, coinSymbol, type:"buy"|"sell", amount, priceAtTime, total, date }
-CHART_DATA [{ date: "Jan"…"Jul", value: number }]
+export const COIN_META = {
+  btc:   { symbol: "BTC",   name: "Bitcoin",     color: "#F7931A" },
+  eth:   { symbol: "ETH",   name: "Ethereum",    color: "#627EEA" },
+  usdt:  { symbol: "USDT",  name: "Tether",      color: "#26A17B" },  // price = $1.00 static
+  sol:   { symbol: "SOL",   name: "Solana",      color: "#9945FF" },
+  bnb:   { symbol: "BNB",   name: "BNB",         color: "#F0B90B" },
+  xrp:   { symbol: "XRP",   name: "XRP",         color: "#346AA9" },
+  xaut:  { symbol: "XAUT",  name: "Tether Gold", color: "#D4AF37" },
+  slvon: { symbol: "SLVON", name: "Silver",      color: "#A8A9AD" },
+  usoon: { symbol: "USOON", name: "Crude Oil",   color: "#7C5C3B" },
+}
 ```
+USDT always returns $1.00 (no Wallex feed). All others via `WALLEX_SYMBOL` → WebSocket.
 
-**Current coins:** BTC, ETH, USDT, XAG (Silver), XAU (Gold), WTI (Oil)
+## Auth Pattern
+- Phone number stored as `{phone}@bluer.app` in Supabase auth (email field)
+- On signup: creates `auth.users` entry + inserts into `profiles` with generated username
+- `AuthModal` has 3 states: `idle` (slim bottom banner) → `login` | `signup` (expanded sheet)
+- `AuthContext` exposes: `user, isLoggedIn, isNew, hydrated, signUp, logIn, logOut, completeOnboarding`
 
-Helper functions exported: `getTotalValue`, `getTotalPL`, `getCoinPL`, `getCoinPLPercent`, `getBreakEven`
+## Onboarding Tour
+- Triggered after signup (`isNew === true`)
+- 4 steps targeting: `[data-tour="buy"]`, `[data-tour="chart"]`, `[data-tour="profile"]`, social tab
+- Spotlight: `box-shadow: 0 0 0 9999px rgba(0,0,0,0.65)` on a fixed positioned div
+- Tooltip: position-aware — appears at top when spotlight is in bottom half of screen (`rect.top > vh * 0.45`)
+
+## Portfolio Derivation
+`usePortfolio(transactions, fallbackPrices)` → `Coin[]`
+- Groups transactions by `coin_id`
+- `holdings = Σ buy.amount − Σ sell.amount` (only coins with holdings > 0 returned)
+- `avgBuyPrice = Σ buy.total / Σ buy.amount`
+- `price = fallbackPrices[id] ?? avgBuyPrice`
+
+## Chart Data
+`MiniChart` accepts optional `data?: {date: string, value: number}[]`.  
+In `page.tsx`, `chartData` is computed via `useMemo` — one point per transaction, running portfolio value using `price_at_time` for the transacted coin and `avgPrice` for others. Falls back to mock `CHART_DATA` when < 2 points.
 
 ## Design System
-- **Theme:** shadcn blue preset — primary is `oklch(0.488 0.243 264.376)` (blue)
-- **Dark/light toggle** — class-based (`.dark` on `<html>`), stored in `localStorage`
-- **Layout:** mobile-first, max-width `max-w-md` centered, sticky header + fixed bottom bar
-- **Colors:** emerald-500 for gains, red-500 for losses
-- **Coin brand colors** stored per coin in mock-data, used as left strip + avatar bg in CoinCard
-- **Border radius:** shadcn uses `rounded-[min(var(--radius-4xl),24px)]` on cards
-- **Animations:**
-  - `animate-fade-up` — staggered fade-in for coin cards (defined in globals.css)
-  - `price-flash-up` / `price-flash-down` — 0.8s color flash on price tick (globals.css)
-  - Chart draw — clip rect animated via `requestAnimationFrame` in MiniChart
-  - Confetti — canvas-confetti, colorful burst on buy, gray shower on sell
+- **Theme:** shadcn blue — primary `oklch(0.488 0.243 264.376)`
+- **Dark/light:** class-based (`.dark` on `<html>`), stored in `localStorage`
+- **Gains:** `text-emerald-500` / **Losses:** `text-red-500`
+- **Animations:** `animate-fade-up` (staggered), `price-flash-up/down` (CoinCard), chart draw animation
+- Mobile-first layout, `max-w-6xl` on desktop, sticky header, fixed bottom bar + `BottomNav`
 
-## UI Patterns / Preferences
-- Mobile-first, no desktop sidebar
-- Terse code, no comments unless non-obvious
-- No extra abstractions — keep components flat
-- All data is mock/static for now; when adding backend use Supabase (MCP available)
-- `fmtCompact(n)` already adds `+`/`-` prefix — don't prepend manually
-- Coin cards: color strip on left, symbol+name+live price on top row, My Value + P/L badge on bottom row
-- Hero card contains: total value → all-time P/L → chart → weekly/monthly P/L → History expand
-- Buy/sell bottom bar is fixed, opens `BuySellModal` with `defaultType` prop
+## Mock Users (Supabase)
+8 sample profiles with transactions:
+- `alexchen4821` — BTC, ETH, SOL
+- `saramoradi7312` — SOL, USDT, BTC
+- `mikejohnson3391` — ETH, XRP
+- `lenavolkov5528` — BTC, BNB, ETH, SOL
+- `jinpark2294` — USDT, BTC
+- `omaralrashid9871` — XRP, BNB, SOL
+- `yukitanaka6640` — SOL, BTC, ETH
+- `nadiapetrov1183` — XAUT (gold), BTC, ETH
 
 ## MCPs Available
-- **Supabase** — for future DB (tables, migrations, edge functions)
-- **shadcn** — component registry (`npx shadcn@latest add <name>`)
-- **Canva, Slack, Linear, Intercom** — also connected but not used in this project yet
-
-## What's Still Mock
-- Prices tick randomly in `CoinCard` (±0.3% every 1.8–3s) — not real API
-- Chart data is hardcoded 7-month array
-- Transactions are static — no persistence
-- No auth, no user accounts
-
-## Next Feature Ideas (backlog)
-- Real price feed (CoinGecko API or websocket)
-- Supabase persistence for transactions
-- Coin detail page with full chart + transaction history
-- Portfolio allocation pie chart
-- Push notifications for price alerts
+- **Supabase** — DB queries, migrations, edge functions
+- **shadcn** — component registry
