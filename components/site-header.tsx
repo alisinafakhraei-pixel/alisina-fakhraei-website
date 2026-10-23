@@ -36,14 +36,14 @@ export function SiteHeader({
 
   return (
     <header className="sticky top-3 z-40">
-      <div className="glass-surface flex items-center gap-1 rounded-full py-1.5 ps-1.5 pe-1.5 lg:ps-3 lg:pe-2">
+      <div className="flex items-center gap-1 rounded-full bg-card py-1.5 ps-1.5 pe-1.5 shadow-[0_16px_40px_-28px_oklch(0.35_0.08_270/0.7)] lg:ps-3 lg:pe-2">
         <Button
           nativeButton={false}
           variant="ghost"
           className="rounded-full px-2"
           render={<Link href={home} />}
         >
-          <span className="grid size-8 place-items-center rounded-full bg-foreground text-xs font-semibold text-background">
+          <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
             AF
           </span>
           <span className="hidden text-sm font-medium sm:inline">
@@ -70,7 +70,7 @@ export function SiteHeader({
         </nav>
 
         <div className="ms-auto flex items-center gap-1">
-          <div className="flex items-center rounded-full bg-foreground/5 p-0.5">
+          <div className="flex items-center rounded-full bg-muted p-0.5">
             <Button
               nativeButton={false}
               size="sm"
@@ -119,7 +119,7 @@ export function SiteHeader({
             </SheetTrigger>
             <SheetContent
               side={locale === "fa" ? "left" : "right"}
-              className="glass-surface w-[min(100%,22rem)] border-border"
+              className="w-[min(100%,22rem)] bg-card data-[side=left]:rounded-e-[2rem] data-[side=right]:rounded-s-[2rem]"
             >
               <SheetHeader>
                 <SheetTitle className="display-title text-2xl">

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, DM_Sans, Vazirmatn } from "next/font/google";
+import { Google_Sans_Flex, Vazirmatn } from "next/font/google";
 import { notFound } from "next/navigation";
 
 import { getDictionary } from "@/lib/content";
@@ -7,16 +7,11 @@ import { isLocale, SITE_URL, type Locale } from "@/lib/site";
 
 import "../globals.css";
 
-const sans = DM_Sans({
+const sans = Google_Sans_Flex({
   subsets: ["latin"],
+  display: "swap",
   variable: "--font-sans",
-  display: "swap",
-});
-
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
+  axes: ["opsz", "ROND"],
 });
 
 const vazir = Vazirmatn({
@@ -26,8 +21,8 @@ const vazir = Vazirmatn({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#161022",
-  colorScheme: "dark",
+  themeColor: "#f4f1fb",
+  colorScheme: "light",
 };
 
 export function generateStaticParams() {
@@ -90,7 +85,7 @@ export default async function LocaleLayout({
     <html
       lang={lang}
       dir={lang === "fa" ? "rtl" : "ltr"}
-      className={`${sans.variable} ${display.variable} ${vazir.variable} dark h-full antialiased`}
+      className={`${sans.variable} ${vazir.variable} h-full antialiased`}
     >
       <body className="min-h-full">{children}</body>
     </html>

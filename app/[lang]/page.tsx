@@ -21,7 +21,6 @@ export default async function Page({
     description: copy.meta.description,
     email: MAILTO,
     url: lang === "fa" ? `${SITE_URL}/fa` : `${SITE_URL}/`,
-    image: `${SITE_URL}/images/alisina.png`,
     sameAs: [LINKEDIN],
     worksFor: [
       {

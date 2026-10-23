@@ -1,9 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { ContactForm } from "@/components/contact-form";
-import { HeroShader } from "@/components/hero-shader";
 import { SiteHeader } from "@/components/site-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -19,12 +17,21 @@ import { Separator } from "@/components/ui/separator";
 import type { Dictionary } from "@/lib/content";
 import { EMAIL, LINKEDIN, localeHash, localeHome, MAILTO, type Locale } from "@/lib/site";
 
+const tones = ["primary", "secondary", "tertiary", "mint"] as const;
+const logoRings = [
+  "ring-secondary",
+  "ring-mint",
+  "ring-tertiary",
+  "ring-primary",
+  "ring-secondary",
+] as const;
+
 function RichText({ parts }: { parts: { text: string; strong?: boolean }[] }) {
   return (
     <>
       {parts.map((part, index) =>
         part.strong ? (
-          <strong key={`${part.text}-${index}`} className="font-semibold text-foreground">
+          <strong key={`${part.text}-${index}`} className="font-semibold">
             {part.text}
           </strong>
         ) : (
@@ -49,14 +56,31 @@ function SectionIntro({
   return (
     <div className="flex items-end justify-between gap-4">
       <div>
-        <p className="meta-label">{kicker}</p>
+        <p className="meta-label text-muted-foreground">{kicker}</p>
         <h2 id={id} className="display-title mt-2 text-3xl md:text-5xl">
           {title}
         </h2>
       </div>
-      <Badge variant="outline" className="mb-1">
+      <Badge className="mb-1 h-7 rounded-full bg-secondary px-3 text-sm text-secondary-foreground">
         {count}
       </Badge>
+    </div>
+  );
+}
+
+function ShapeStat({
+  value,
+  label,
+  className,
+}: {
+  value: string;
+  label: string;
+  className: string;
+}) {
+  return (
+    <div className={`shape-morph flex min-h-32 flex-col justify-end p-5 ${className}`}>
+      <p className="display-title text-4xl">{value}</p>
+      <p className="mt-1 text-sm font-semibold">{label}</p>
     </div>
   );
 }
@@ -66,42 +90,34 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
 
   return (
     <div className="relative min-h-svh">
-      <div className="page-wash pointer-events-none fixed inset-0 -z-10" aria-hidden="true" />
       <a
         href="#content"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
       >
         {copy.skip}
       </a>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-3 py-3 md:gap-5 md:px-5 md:py-5">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-3 py-3 md:gap-6 md:px-5 md:py-5">
         <SiteHeader locale={locale} copy={copy} />
-        <main id="content" className="flex flex-col gap-4 md:gap-6">
+        <main id="content" className="flex flex-col gap-8 md:gap-12">
           <section
             id="top"
             aria-labelledby="hero-title"
-            className="relative isolate overflow-hidden rounded-[1.75rem] md:rounded-[2rem]"
+            className="shape-hero relative isolate overflow-hidden bg-primary text-primary-foreground"
           >
-            <HeroShader />
-            <div className="relative z-10 grid lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-              <div className="flex min-h-[calc(100svh-6.75rem)] flex-col gap-6 px-5 py-7 md:px-10 md:py-12">
-                <div className="flex items-center justify-between gap-4">
-                  <p className="meta-label">{copy.hero.role}</p>
-                  <div className="relative size-16 overflow-hidden rounded-full ring-1 ring-border lg:hidden">
-                    <Image
-                      src="/images/alisina.png"
-                      alt=""
-                      fill
-                      sizes="64px"
-                      className="object-cover object-[center_18%]"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-2">
-                  <p className="text-sm text-muted-foreground md:text-base">{copy.hero.hello}</p>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -top-24 -end-16 hidden size-72 rounded-full bg-secondary lg:block"
+            />
+            <div className="relative z-10 grid lg:grid-cols-[minmax(0,1.35fr)_minmax(16rem,0.7fr)]">
+              <div className="flex flex-col gap-6 px-5 py-8 md:px-10 md:py-12">
+                <p className="meta-label text-primary-foreground/80">{copy.hero.role}</p>
+                <div>
+                  <p className="text-sm font-medium text-primary-foreground/80 md:text-base">
+                    {copy.hero.hello}
+                  </p>
                   <h1
                     id="hero-title"
-                    className="display-title mt-2 text-[clamp(3rem,8vw,6.4rem)]"
+                    className="display-title mt-2 text-[clamp(3.2rem,8.4vw,6.5rem)]"
                   >
                     {copy.hero.nameLines[0]}
                     <br />
@@ -109,26 +125,31 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                   </h1>
                 </div>
 
-                <p className="max-w-xl text-[clamp(1.25rem,2.6vw,2rem)] leading-snug font-medium text-balance">
+                <p className="max-w-xl text-[clamp(1.3rem,2.7vw,2.05rem)] leading-snug font-medium text-balance">
                   {copy.hero.before}
-                  <span className="text-gradient">{copy.hero.highlight}</span>
+                  <span className="marker">{copy.hero.highlight}</span>
                   {copy.hero.after}
                 </p>
 
-                <Card variant="glass" size="sm" className="max-w-xl">
-                  <CardContent className="text-sm leading-relaxed text-pretty text-foreground/90 md:text-base">
+                <Card tone="surface" size="sm" className="max-w-xl shadow-none">
+                  <CardContent className="text-sm leading-relaxed text-pretty md:text-base">
                     <RichText parts={copy.hero.bio} />
                   </CardContent>
                 </Card>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button nativeButton={false} size="lg" render={<a href={MAILTO} />}>
+                  <Button
+                    nativeButton={false}
+                    size="lg"
+                    className="bg-card text-foreground hover:bg-card"
+                    render={<a href={MAILTO} />}
+                  >
                     {copy.nav.email}
                   </Button>
                   <Button
                     nativeButton={false}
                     size="lg"
-                    variant="glass"
+                    variant="secondary"
                     render={
                       <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" />
                     }
@@ -140,45 +161,36 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                 <a
                   href={MAILTO}
                   dir="ltr"
-                  className="w-fit text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                  className="w-fit text-sm text-primary-foreground/80 underline-offset-4 hover:text-primary-foreground hover:underline"
                 >
                   {EMAIL}
                 </a>
 
-                <div className="mt-auto flex items-end justify-between gap-4 pt-6">
-                  <p className="meta-label max-w-40">
-                    <span className="display-title block text-2xl text-foreground normal-case tracking-normal">
-                      {copy.hero.yearsValue}
-                    </span>
-                    {copy.hero.yearsLabel}
-                  </p>
-                  <Link
-                    href={localeHash(locale, "experience")}
-                    className="meta-label inline-flex items-center gap-2"
-                  >
-                    {copy.hero.next}
-                    <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
-                  </Link>
-                </div>
+                <Link
+                  href={localeHash(locale, "experience")}
+                  className="meta-label inline-flex w-fit items-center gap-2 text-primary-foreground/80"
+                >
+                  {copy.hero.next}
+                  <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
+                </Link>
               </div>
 
-              <div className="relative hidden min-h-[32rem] lg:block">
-                <Image
-                  src="/images/alisina.png"
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 36vw, 0px"
-                  className="portrait-mask object-cover object-[center_18%]"
+              <div className="relative z-10 grid gap-3 p-4 sm:grid-cols-3 lg:flex lg:flex-col lg:justify-end lg:p-6">
+                <ShapeStat
+                  value={copy.hero.statValue}
+                  label={copy.hero.statLabel}
+                  className="shape-squircle bg-secondary text-secondary-foreground"
                 />
-                <div className="portrait-wash pointer-events-none absolute inset-0" aria-hidden="true" />
-                <Card variant="glass" size="sm" className="absolute end-6 bottom-8 w-40">
-                  <CardHeader>
-                    <CardTitle className="display-title text-3xl">
-                      {copy.hero.statValue}
-                    </CardTitle>
-                    <CardDescription>{copy.hero.statLabel}</CardDescription>
-                  </CardHeader>
-                </Card>
+                <ShapeStat
+                  value={copy.hero.yearsValue}
+                  label={copy.hero.yearsLabel}
+                  className="shape-blob bg-mint text-mint-foreground"
+                />
+                <ShapeStat
+                  value={copy.hero.since}
+                  label={copy.hero.sinceLabel}
+                  className="shape-pill bg-tertiary text-tertiary-foreground"
+                />
               </div>
             </div>
           </section>
@@ -195,21 +207,23 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
               count={copy.experience.count}
             />
             <ul className="flex flex-col gap-3">
-              {copy.experience.roles.map((role) => (
+              {copy.experience.roles.map((role, index) => (
                 <li key={`${role.role}-${role.meta}`}>
                   <a
                     href={role.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-xl focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-none"
+                    className="block rounded-[2rem] focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-none"
                   >
-                    <Card variant="glass" size="sm" className="lift">
+                    <Card size="sm" className="shape-morph">
                       <CardHeader className="flex flex-row items-center gap-3">
-                        <Avatar className="size-12 rounded-2xl after:rounded-2xl">
+                        <Avatar
+                          className={`size-12 rounded-2xl bg-card ring-4 after:rounded-2xl ${logoRings[index] ?? "ring-secondary"}`}
+                        >
                           <AvatarImage
                             src={role.logo}
                             alt=""
-                            className="rounded-2xl bg-white object-contain p-1"
+                            className="rounded-2xl bg-card object-contain p-1"
                           />
                           <AvatarFallback className="rounded-2xl">{role.mark}</AvatarFallback>
                         </Avatar>
@@ -247,29 +261,31 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
               count={copy.impact.count}
             />
             <ul className="grid gap-3 sm:grid-cols-2">
-              {copy.impact.items.map((item) => (
+              {copy.impact.items.map((item, index) => (
                 <li key={item.detail}>
-                  <Card variant="glass" className="h-full">
+                  <Card tone={tones[index % tones.length]} className="shape-morph h-full">
                     <CardHeader>
-                      <p className="meta-label">{item.mark}</p>
+                      <p className="meta-label text-current/70">{item.mark}</p>
                       <CardTitle className="display-title text-4xl md:text-5xl">
                         {item.figure}
                       </CardTitle>
-                      <CardDescription className="text-base text-foreground/90">
-                        {item.caption}
-                      </CardDescription>
+                      <CardDescription className="text-base">{item.caption}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground">{item.detail}</p>
+                      <p className="text-sm text-current/75">{item.detail}</p>
                     </CardContent>
                   </Card>
                 </li>
               ))}
             </ul>
             <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              {copy.impact.stats.map((stat) => (
+              {copy.impact.stats.map((stat, index) => (
                 <li key={stat.label}>
-                  <Card variant="glass" size="sm" className="h-full">
+                  <Card
+                    tone={tones[(index + 1) % tones.length]}
+                    size="sm"
+                    className="shape-morph h-full"
+                  >
                     <CardHeader>
                       <CardTitle className="display-title text-3xl">{stat.value}</CardTitle>
                       <CardDescription>{stat.label}</CardDescription>
@@ -297,7 +313,7 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
               </p>
             </div>
             <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2 lg:grid lg:grid-cols-3 lg:overflow-visible">
-              {copy.projects.items.map((item) => (
+              {copy.projects.items.map((item, index) => (
                 <li
                   key={item.href}
                   className="w-[min(82vw,19.5rem)] shrink-0 snap-start lg:w-auto"
@@ -306,16 +322,15 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                     href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block h-full rounded-xl focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-none"
+                    className="block h-full rounded-[2rem] focus-visible:ring-3 focus-visible:ring-ring focus-visible:outline-none"
                   >
-                    <Card variant="glass" className="lift h-full">
+                    <Card tone={tones[index % tones.length]} className="shape-morph h-full">
                       <CardHeader>
                         <div className="flex items-center justify-between gap-2">
-                          <Badge variant="secondary">{item.day}</Badge>
-                          <ArrowUpRight
-                            className="size-4 text-muted-foreground rtl:-scale-x-100"
-                            aria-hidden="true"
-                          />
+                          <Badge className="h-7 rounded-full bg-card px-3 text-card-foreground">
+                            {item.day}
+                          </Badge>
+                          <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                         </div>
                         <p className="display-title pt-6 text-4xl">{item.preview}</p>
                         <CardTitle className="display-title text-2xl">{item.name}</CardTitle>
@@ -325,7 +340,11 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                       </CardHeader>
                       <CardContent className="mt-auto flex flex-wrap gap-1.5">
                         {item.tags.map((tag) => (
-                          <Badge key={tag} variant="outline">
+                          <Badge
+                            key={tag}
+                            variant="outline"
+                            className="h-6 rounded-full border-transparent bg-foreground/10 px-2.5 text-inherit"
+                          >
                             {tag}
                           </Badge>
                         ))}
@@ -350,15 +369,21 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
               count={copy.education.count}
             />
             <ul className="grid gap-3 md:grid-cols-2">
-              {copy.education.items.map((item) => (
+              {copy.education.items.map((item, index) => (
                 <li key={`${item.name}-${item.year}`}>
-                  <Card variant="glass" size="sm" className="h-full">
+                  <Card
+                    tone={index % 2 === 0 ? "surface" : "mint"}
+                    size="sm"
+                    className="shape-morph h-full"
+                  >
                     <CardHeader className="flex flex-row items-start justify-between gap-3">
                       <div className="min-w-0">
                         <CardTitle className="text-pretty">{item.name}</CardTitle>
                         <CardDescription className="mt-1">{item.detail}</CardDescription>
                       </div>
-                      <Badge variant="outline">{item.year}</Badge>
+                      <Badge className="rounded-full bg-secondary text-secondary-foreground">
+                        {item.year}
+                      </Badge>
                     </CardHeader>
                   </Card>
                 </li>
@@ -372,12 +397,12 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
             className="scroll-mt-28 grid gap-4 px-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start"
           >
             <div className="flex flex-col gap-4">
-              <p className="meta-label">{copy.contact.kicker}</p>
+              <p className="meta-label text-muted-foreground">{copy.contact.kicker}</p>
               <h2 id="contact-title" className="display-title text-4xl md:text-6xl">
                 {copy.contact.line1}
                 <br />
                 {copy.contact.before}
-                <span className="text-gradient">{copy.contact.highlight}</span>
+                <span className="marker">{copy.contact.highlight}</span>
               </h2>
               <p className="max-w-md text-pretty text-muted-foreground">{copy.contact.intro}</p>
               <div className="flex flex-wrap gap-2">
@@ -387,7 +412,7 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                 <Button
                   nativeButton={false}
                   size="lg"
-                  variant="outline"
+                  variant="secondary"
                   render={
                     <a href={LINKEDIN} target="_blank" rel="noopener noreferrer" />
                   }
@@ -403,7 +428,7 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
                 {EMAIL}
               </a>
             </div>
-            <Card variant="glass">
+            <Card className="shape-morph">
               <CardHeader>
                 <CardTitle className="text-lg">{copy.contact.formTitle}</CardTitle>
                 <CardDescription>{copy.contact.formHint}</CardDescription>
@@ -419,7 +444,7 @@ export function HomeView({ locale, copy }: { locale: Locale; copy: Dictionary })
           <Separator className="mb-5" />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-medium">{copy.hero.name}</p>
+              <p className="font-semibold">{copy.hero.name}</p>
               <p className="text-sm text-muted-foreground">
                 {copy.footer.rights}
                 {" · "}

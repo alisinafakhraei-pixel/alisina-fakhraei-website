@@ -18,10 +18,7 @@ export default async function OpenGraphImage({
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : "en";
   const copy = getDictionary(locale);
-  const [font, photo] = await Promise.all([
-    readFile(join(process.cwd(), "fonts/Vazirmatn-Bold.ttf")),
-    readFile(join(process.cwd(), "public/images/alisina.png")),
-  ]);
+  const font = await readFile(join(process.cwd(), "fonts/Vazirmatn-Bold.ttf"));
   const isFa = locale === "fa";
 
   return new ImageResponse(
@@ -31,95 +28,87 @@ export default async function OpenGraphImage({
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: isFa ? "row-reverse" : "row",
-          background: "#120e1c",
-          color: "#f7f4ef",
+          background: "#f4f1fb",
+          padding: 36,
           fontFamily: "Vazirmatn",
         }}
       >
         <div
           style={{
-            position: "absolute",
-            top: -120,
-            left: isFa ? undefined : -80,
-            right: isFa ? -80 : undefined,
-            width: 460,
-            height: 460,
-            borderRadius: 999,
-            background: "#1d7f8e",
-            opacity: 0.85,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: -160,
-            left: isFa ? 80 : 280,
-            width: 420,
-            height: 420,
-            borderRadius: 999,
-            background: "#c56a3a",
-            opacity: 0.55,
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 40,
-            right: isFa ? undefined : 360,
-            left: isFa ? 360 : undefined,
-            width: 280,
-            height: 280,
-            borderRadius: 999,
-            background: "#6a3d9a",
-            opacity: 0.45,
-          }}
-        />
-        <div
-          style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "flex-end",
-            width: 740,
+            justifyContent: "space-between",
+            width: "100%",
             height: "100%",
-            padding: 64,
+            background: "#2d4fe0",
+            color: "#f7f8ff",
+            borderRadius: 56,
+            padding: 56,
             position: "relative",
-            textAlign: isFa ? "right" : "left",
+            overflow: "hidden",
           }}
         >
-          <div style={{ fontSize: 22, letterSpacing: isFa ? 0 : 3, opacity: 0.85 }}>
+          <div
+            style={{
+              position: "absolute",
+              top: -90,
+              right: isFa ? undefined : -70,
+              left: isFa ? -70 : undefined,
+              width: 280,
+              height: 280,
+              borderRadius: 999,
+              background: "#ffe14a",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              bottom: -80,
+              left: isFa ? undefined : -40,
+              right: isFa ? -40 : undefined,
+              width: 220,
+              height: 220,
+              borderRadius: 80,
+              background: "#9eefd8",
+            }}
+          />
+          <div style={{ fontSize: 22, letterSpacing: isFa ? 0 : 2, zIndex: 1 }}>
             {isFa ? "مدیر محصول" : "PRODUCT MANAGER"}
           </div>
-          <div
-            style={{
-              fontSize: isFa ? 72 : 78,
-              lineHeight: isFa ? 1.25 : 0.95,
-              marginTop: 18,
-              fontWeight: 700,
-            }}
-          >
-            {copy.hero.nameLines[0]}
-          </div>
-          <div
-            style={{
-              fontSize: isFa ? 72 : 78,
-              lineHeight: isFa ? 1.25 : 0.95,
-              fontWeight: 700,
-            }}
-          >
-            {copy.hero.nameLines[1]}
-          </div>
-          <div style={{ fontSize: 28, marginTop: 28, lineHeight: 1.35, maxWidth: 620 }}>
-            {copy.meta.ogTagline}
+          <div style={{ display: "flex", flexDirection: "column", zIndex: 1 }}>
+            <div
+              style={{
+                fontSize: isFa ? 78 : 86,
+                lineHeight: isFa ? 1.25 : 0.92,
+                fontWeight: 700,
+                textAlign: isFa ? "right" : "left",
+              }}
+            >
+              {copy.hero.nameLines[0]}
+            </div>
+            <div
+              style={{
+                fontSize: isFa ? 78 : 86,
+                lineHeight: isFa ? 1.25 : 0.92,
+                fontWeight: 700,
+                textAlign: isFa ? "right" : "left",
+              }}
+            >
+              {copy.hero.nameLines[1]}
+            </div>
+            <div
+              style={{
+                fontSize: 30,
+                marginTop: 28,
+                lineHeight: 1.35,
+                maxWidth: 760,
+                textAlign: isFa ? "right" : "left",
+              }}
+            >
+              {copy.meta.ogTagline}
+            </div>
           </div>
         </div>
-        <img
-          alt=""
-          src={`data:image/png;base64,${photo.toString("base64")}`}
-          width={460}
-          height={630}
-          style={{ objectFit: "cover", objectPosition: "center 18%" }}
-        />
       </div>
     ),
     {
