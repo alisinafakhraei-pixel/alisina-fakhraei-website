@@ -11,17 +11,25 @@ export default function Icon() {
           width: 32,
           height: 32,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          flexDirection: "column",
           background: "#000",
-          color: "#fff",
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: -0.5,
-          borderRadius: 4,
         }}
       >
-        AF
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: -0.4,
+          }}
+        >
+          AF
+        </div>
+        <div style={{ height: 3, background: "#8ecaf2" }} />
       </div>
     ),
     { ...size },

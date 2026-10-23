@@ -1,66 +1,66 @@
 import { companyLinks, type Locale } from "@/lib/site";
 
-type Segment = { text: string; strong?: boolean };
+export type Segment = { text: string; strong?: boolean; latin?: boolean };
+
+export type SpecEntry = {
+  id: string;
+  live: boolean;
+  status: string;
+  role: string;
+  org: string;
+  meta: string;
+  note: string;
+  href: string;
+  logo: string;
+};
 
 export type Dictionary = {
   meta: { title: string; description: string; ogTagline: string };
   skip: string;
-  nav: {
-    home: string;
-    experience: string;
-    impact: string;
-    projects: string;
-    education: string;
-    contact: string;
-    email: string;
-    linkedin: string;
-    menu: string;
-    openMenu: string;
-    closeMenu: string;
+  chrome: {
+    docId: string;
+    revLabel: string;
+    rev: string;
+    tehran: string;
+    index: string;
+    openIndex: string;
+    closeIndex: string;
+    search: string;
+    searchLabel: string;
+    empty: string;
+    language: string;
   };
-  hero: {
-    hello: string;
+  sections: { id: string; index: string; label: string; rail: string }[];
+  links: { email: string; linkedin: string };
+  cover: {
+    role: string;
     name: string;
     nameLines: [string, string];
     before: string;
     highlight: string;
     after: string;
     bio: Segment[];
-    yearsValue: string;
-    yearsLabel: string;
-    since: string;
-    sinceLabel: string;
-    statValue: string;
-    statLabel: string;
-    role: string;
-    next: string;
+    facts: { label: string; value: string }[];
   };
-  experience: {
-    kicker: string;
+  changelog: {
     title: string;
-    count: string;
-    roles: {
-      role: string;
-      org: string;
-      meta: string;
-      href: string;
-      logo: string;
-      mark: string;
-    }[];
+    lede: string;
+    entries: SpecEntry[];
   };
-  impact: {
-    kicker: string;
+  metrics: {
     title: string;
-    count: string;
-    items: { mark: string; figure: string; caption: string; detail: string }[];
+    lede: string;
+    outcomeLabel: string;
+    sourceLabel: string;
+    outcomes: { figure: string; caption: string; source: string }[];
+    scaleLabel: string;
     stats: { value: string; label: string }[];
   };
-  projects: {
-    kicker: string;
+  builds: {
     title: string;
-    count: string;
     intro: Segment[];
-    swipe: string;
+    open: string;
+    specimen: string;
     items: {
       day: string;
       name: string;
@@ -70,20 +70,15 @@ export type Dictionary = {
       tags: string[];
     }[];
   };
-  education: {
-    kicker: string;
+  appendix: {
     title: string;
-    count: string;
+    lede: string;
     items: { name: string; detail: string; year: string }[];
   };
   contact: {
-    kicker: string;
-    line1: string;
-    before: string;
-    highlight: string;
-    intro: string;
-    formTitle: string;
-    formHint: string;
+    title: string;
+    lede: string;
+    direct: string;
     name: string;
     email: string;
     message: string;
@@ -98,7 +93,7 @@ export type Dictionary = {
     nameLong: string;
     messageLong: string;
   };
-  footer: { role: string; rights: string; backToTop: string };
+  footer: { role: string; rights: string; top: string };
   notFound: { title: string; body: string; home: string };
 };
 
@@ -106,152 +101,171 @@ const en: Dictionary = {
   meta: {
     title: "Alisina Fakhraei — Product Manager",
     description:
-      "Alisina Fakhraei is a product manager at Formaloo, a top-5 global form builder trusted by 30,000+ businesses. He also leads product at VaDostan and partners with TEDxTehran.",
-    ogTagline: "I build products people actually love to use.",
+      "Alisina Fakhraei is Product Manager & QA at Formaloo, a top-5 global form builder trusted by 30,000+ businesses, and Product & Design Lead at VaDostan. Partnership Manager at TEDxTehran. Public outcomes include 68% fewer weekly production bugs, 46% less first-week drop-off, and time-to-purchase from 7 to 3 minutes.",
+    ogTagline: "Until the number moves, the work isn't done.",
   },
   skip: "Skip to content",
-  nav: {
-    home: "Home",
-    experience: "Experience",
-    impact: "Impact",
-    projects: "AI Projects",
-    education: "Education",
-    contact: "Contact",
-    email: "Email me",
-    linkedin: "LinkedIn",
-    menu: "Menu",
-    openMenu: "Open menu",
-    closeMenu: "Close menu",
+  chrome: {
+    docId: "AF–SPEC",
+    revLabel: "Rev",
+    rev: "2026.10",
+    tehran: "Tehran",
+    index: "Index",
+    openIndex: "Open the index",
+    closeIndex: "Close the index",
+    search: "Jump to a section",
+    searchLabel: "Search the spec",
+    empty: "Nothing in the spec matches.",
+    language: "فارسی",
   },
-  hero: {
-    hello: "Hello! I'm",
+  sections: [
+    { id: "cover", index: "01", label: "Cover", rail: "Read me first" },
+    { id: "changelog", index: "02", label: "Changelog", rail: "05 releases" },
+    { id: "metrics", index: "03", label: "Metrics", rail: "08 figures" },
+    { id: "builds", index: "04", label: "Builds", rail: "03 public" },
+    { id: "appendix", index: "05", label: "Appendix", rail: "06 records" },
+    { id: "contact", index: "06", label: "Contact", rail: "Write in" },
+  ],
+  links: { email: "Email", linkedin: "LinkedIn" },
+  cover: {
+    role: "Product Manager",
     name: "Alisina Fakhraei",
     nameLines: ["Alisina", "Fakhraei"],
-    before: "I build products people actually ",
-    highlight: "love",
-    after: " to use.",
+    before: "Until the ",
+    highlight: "number",
+    after: " moves, the work isn't done.",
     bio: [
-      { text: "Product Manager at " },
+      { text: "Product Manager & QA at " },
       { text: "Formaloo", strong: true },
       {
-        text: ", a top-5 global form builder trusted by 30,000+ businesses. I also lead product at ",
+        text: ", a top-5 global form builder trusted by 30,000+ businesses. Product & Design Lead at ",
       },
       { text: "VaDostan", strong: true },
       {
-        text: ", a social commerce platform with 500K+ followers, and contribute to ",
+        text: ", a social commerce platform with 500K+ followers. Partnership Manager at ",
       },
       { text: "TEDxTehran", strong: true },
-      { text: " as a Partnership Manager and event co-organizer." },
+      {
+        text: ", and co-organizer of the event from December 2024 to May 2025.",
+      },
     ],
-    yearsValue: "2+",
-    yearsLabel: "years building products",
-    since: "May 2024",
-    sinceLabel: "Formaloo",
-    statValue: "30K+",
-    statLabel: "businesses on Formaloo",
-    role: "Product Manager",
-    next: "Next",
+    facts: [
+      { label: "Practice", value: "2+ years" },
+      { label: "Formaloo", value: "Since May 2024" },
+      { label: "VaDostan", value: "Since Jan 2025" },
+    ],
   },
-  experience: {
-    kicker: "Track record",
-    title: "Experience & impact",
-    count: "05",
-    roles: [
+  changelog: {
+    title: "Changelog",
+    lede: "Five roles, written as releases. Four are live. One closed in May 2025.",
+    entries: [
       {
-        role: "Product Manager & QA",
-        org: "Formaloo",
-        meta: "May 2024 – Present · Canada / England / Estonia",
-        href: companyLinks.formaloo,
-        logo: "/images/formaloo.png",
-        mark: "F",
-      },
-      {
-        role: "Product & Design Lead",
-        org: "VaDostan",
-        meta: "Jan 2025 – Present · Iran",
-        href: companyLinks.vadostan,
-        logo: "/images/vadostan.jpeg",
-        mark: "V",
-      },
-      {
+        id: "2026.07",
+        live: true,
+        status: "Live",
         role: "Teaching Assistant, PM Bootcamp",
         org: "Diginext (Digikala)",
         meta: "Jul 2026 – Present · Weekend · Iran",
+        note: "Teaching assistant for the product management bootcamp.",
         href: companyLinks.diginext,
         logo: "/images/diginext.png",
-        mark: "D",
       },
       {
-        role: "Partnership Manager",
-        org: "TEDxTehran",
-        meta: "Apr 2022 – Present · Volunteer",
-        href: companyLinks.tedx,
-        logo: "/images/tedxtehran.png",
-        mark: "T",
+        id: "2025.01",
+        live: true,
+        status: "Live",
+        role: "Product & Design Lead",
+        org: "VaDostan",
+        meta: "Jan 2025 – Present · Iran",
+        note: "UX journey redesign.",
+        href: companyLinks.vadostan,
+        logo: "/images/vadostan.jpeg",
       },
       {
+        id: "2024.12",
+        live: false,
+        status: "Closed",
         role: "Co-organizer",
         org: "TEDxTehran",
         meta: "Dec 2024 – May 2025 · Volunteer",
+        note: "Co-organized the event. Closed May 2025.",
         href: companyLinks.tedx,
         logo: "/images/tedxtehran.png",
-        mark: "T",
+      },
+      {
+        id: "2024.05",
+        live: true,
+        status: "Live",
+        role: "Product Manager & QA",
+        org: "Formaloo",
+        meta: "May 2024 – Present · Canada / England / Estonia",
+        note: "QA and release tightening. Onboarding redesign.",
+        href: companyLinks.formaloo,
+        logo: "/images/formaloo.png",
+      },
+      {
+        id: "2022.04",
+        live: true,
+        status: "Live",
+        role: "Partnership Manager",
+        org: "TEDxTehran",
+        meta: "Apr 2022 – Present · Volunteer",
+        note: "Partner outreach.",
+        href: companyLinks.tedx,
+        logo: "/images/tedxtehran.png",
       },
     ],
   },
-  impact: {
-    kicker: "Outcomes",
-    title: "Impact highlights",
-    count: "04",
-    items: [
+  metrics: {
+    title: "Metrics",
+    lede: "Four outcomes with a source. Four figures for scale. That is the whole dashboard.",
+    outcomeLabel: "Outcome",
+    sourceLabel: "Source",
+    outcomes: [
       {
-        mark: "↓",
         figure: "68%",
-        caption: "fewer weekly production bugs",
-        detail: "Formaloo · QA & release tightening",
+        caption: "Fewer weekly production bugs",
+        source: "Formaloo · QA & release tightening",
       },
       {
-        mark: "↓",
         figure: "46%",
-        caption: "less first-week drop-off",
-        detail: "Formaloo · Onboarding redesign",
+        caption: "Less first-week drop-off",
+        source: "Formaloo · Onboarding redesign",
       },
       {
-        mark: "→",
         figure: "7 → 3 min",
-        caption: "time-to-purchase",
-        detail: "VaDostan · UX journey redesign",
+        caption: "Time to purchase",
+        source: "VaDostan · UX journey redesign",
       },
       {
-        mark: "$",
         figure: "$10,000+",
-        caption: "sponsorship secured",
-        detail: "TEDxTehran · Partner outreach",
+        caption: "Sponsorship secured",
+        source: "TEDxTehran · Partner outreach",
       },
     ],
+    scaleLabel: "Scale",
     stats: [
-      { value: "30K+", label: "Businesses using Formaloo" },
+      { value: "30K+", label: "Businesses on Formaloo" },
       { value: "500K+", label: "VaDostan social followers" },
       { value: "1M+", label: "TEDxTehran social views" },
       { value: "87%", label: "Customer satisfaction lift" },
     ],
   },
-  projects: {
-    kicker: "Daily builds",
-    title: "One AI app. Every day.",
-    count: "∞",
+  builds: {
+    title: "Builds",
     intro: [
-      { text: "I build and ship a new AI app daily using " },
-      { text: "Claude Code", strong: true },
-      { text: ". See them all below." },
+      { text: "I build and ship a new AI app every day with " },
+      { text: "Claude Code", strong: true, latin: true },
+      { text: ". Three of them are public here." },
     ],
-    swipe: "Swipe to explore the daily builds",
+    open: "Open",
+    specimen: "Specimen",
     items: [
       {
         day: "Day 01",
         name: "Tasks",
         description:
-          "Keep track of your tasks, share lists, and collaborate with others. Built using Claude Code and Supabase.",
+          "A shared list for the work in front of you. Track tasks, hand the list to someone else, and finish it together. Built with Claude Code and Supabase.",
         href: companyLinks.tasks,
         preview: "3 of 7 done",
         tags: ["Claude Code", "Supabase"],
@@ -260,7 +274,7 @@ const en: Dictionary = {
         day: "Day 02",
         name: "Price of That",
         description:
-          "Stop thinking in dollars. Price of That turns any price into hours of your life based on your salary, so you can decide if something is truly worth it.",
+          "Stop pricing things in money alone. It turns a price into hours of your life, from your salary, so you can tell whether it is actually worth the time.",
         href: companyLinks.priceOfThat,
         preview: "12.4 hrs",
         tags: ["Claude Code"],
@@ -269,17 +283,16 @@ const en: Dictionary = {
         day: "Day 03",
         name: "Lapse",
         description:
-          "Tracks every subscription, contract, and license your business runs on — so nothing quietly auto-renews at a higher rate or disappears when you weren't looking.",
+          "Every subscription, contract, and license the business runs on, in one place — so nothing quietly auto-renews at a higher rate, or disappears while you are looking elsewhere.",
         href: companyLinks.lapse,
         preview: "$1,240 / mo",
         tags: ["Claude Code"],
       },
     ],
   },
-  education: {
-    kicker: "Learning",
-    title: "Education & certifications",
-    count: "06",
+  appendix: {
+    title: "Appendix",
+    lede: "The training on record. Degrees, bootcamps, and the certificates behind the practice.",
     items: [
       {
         name: "Sharif University of Technology",
@@ -314,37 +327,32 @@ const en: Dictionary = {
     ],
   },
   contact: {
-    kicker: "Let's talk",
-    line1: "Have an idea?",
-    before: "Let's make it ",
-    highlight: "real.",
-    intro:
-      "Leave your email, and a name or note if you want. Or write directly.",
-    formTitle: "Leave your email",
-    formHint: "Name and message are optional.",
-    name: "Name (optional)",
+    title: "Send the problem.",
+    lede: "If it is a product problem, send the specific version. An email is enough. A name and a note are optional — or write directly.",
+    direct: "Or write directly",
+    name: "Name, optional",
     email: "Email",
-    message: "Message (optional)",
+    message: "Note, optional",
     submit: "Send",
     sending: "Sending",
     successTitle: "Got it.",
-    successBody: "Thanks for leaving your email.",
-    errorTitle: "That didn’t send.",
-    errorBody: "Try again, or email directly.",
+    successBody: "Thanks. The address is what I needed.",
+    errorTitle: "It didn’t send.",
+    errorBody: "Try once more, or use the email address above.",
     emailRequired: "Enter your email.",
     emailInvalid: "Enter a valid email.",
     nameLong: "That name is too long.",
-    messageLong: "That message is too long.",
+    messageLong: "That note is too long.",
   },
   footer: {
     role: "Product Manager & QA",
     rights: "© 2026",
-    backToTop: "Back to top",
+    top: "Top",
   },
   notFound: {
-    title: "Page not found",
-    body: "That page isn’t here.",
-    home: "Back home",
+    title: "This page is not in the spec.",
+    body: "That address doesn’t match a section.",
+    home: "Back to the spec",
   },
 };
 
@@ -352,156 +360,169 @@ const fa: Dictionary = {
   meta: {
     title: "علیسینا فخرایی — مدیر محصول",
     description:
-      "علیسینا فخرایی مدیر محصول در فرمالو است؛ یکی از پنج فرم‌ساز برتر جهان که بیش از ۳۰٬۰۰۰ کسب‌وکار به آن اعتماد دارند. او رهبری محصول وادوستان را هم بر عهده دارد و با تدکس تهران همکاری می‌کند.",
-    ogTagline: "محصولاتی می‌سازم که مردم واقعاً عاشق استفاده از آن‌ها هستند.",
+      "علیسینا فخرایی مدیر محصول و تضمین کیفیت در فرمالو است؛ یکی از پنج فرم‌ساز برتر جهان که بیش از ۳۰٬۰۰۰ کسب‌وکار به آن اعتماد دارند. لید محصول و طراحی وادوستان، و مدیر مشارکت تدکس تهران. نتیجه‌های عمومی: ۶۸٪ باگ کمتر در پروداکشن هر هفته، ۴۶٪ ریزش کمتر در هفتهٔ اول، و زمان خرید از ۷ به ۳ دقیقه.",
+    ogTagline: "کار وقتی تمام است که عدد عوض شده باشد.",
   },
   skip: "رفتن به محتوا",
-  nav: {
-    home: "خانه",
-    experience: "تجربه",
-    impact: "اثرگذاری",
-    projects: "پروژه‌های هوش مصنوعی",
-    education: "تحصیلات",
-    contact: "تماس",
-    email: "ایمیل بزنید",
-    linkedin: "لینکدین",
-    menu: "منو",
-    openMenu: "باز کردن منو",
-    closeMenu: "بستن منو",
+  chrome: {
+    docId: "AF–SPEC",
+    revLabel: "نسخه",
+    rev: "۲۰۲۶٫۱۰",
+    tehran: "تهران",
+    index: "فهرست",
+    openIndex: "باز کردن فهرست",
+    closeIndex: "بستن فهرست",
+    search: "برو به یک بخش",
+    searchLabel: "جستجو در سند",
+    empty: "در سند چیزی با این عبارت نیست.",
+    language: "English",
   },
-  hero: {
-    hello: "سلام، من",
+  sections: [
+    { id: "cover", index: "۰۱", label: "جلد", rail: "اول این را بخوان" },
+    { id: "changelog", index: "۰۲", label: "تغییرات", rail: "۰۵ انتشار" },
+    { id: "metrics", index: "۰۳", label: "سنجه‌ها", rail: "۰۸ رقم" },
+    { id: "builds", index: "۰۴", label: "ساخته‌ها", rail: "۰۳ عمومی" },
+    { id: "appendix", index: "۰۵", label: "پیوست", rail: "۰۶ رکورد" },
+    { id: "contact", index: "۰۶", label: "تماس", rail: "بنویس" },
+  ],
+  links: { email: "ایمیل", linkedin: "لینکدین" },
+  cover: {
+    role: "مدیر محصول",
     name: "علیسینا فخرایی",
     nameLines: ["علیسینا", "فخرایی"],
-    before: "محصولاتی می‌سازم که مردم واقعاً ",
-    highlight: "عاشق",
-    after: " استفاده از آن‌ها هستند.",
+    before: "کار وقتی تمام است که ",
+    highlight: "عدد",
+    after: " عوض شده باشد.",
     bio: [
-      { text: "مدیر محصول در " },
+      { text: "مدیر محصول و تضمین کیفیت در " },
       { text: "فرمالو", strong: true },
       {
-        text: " هستم؛ یکی از پنج فرم‌ساز برتر جهان که بیش از ۳۰٬۰۰۰ کسب‌وکار به آن اعتماد دارند. رهبری محصول ",
+        text: "، یکی از پنج فرم‌ساز برتر جهان که بیش از ۳۰٬۰۰۰ کسب‌وکار به آن اعتماد دارند. لید محصول و طراحی در ",
       },
       { text: "وادوستان", strong: true },
       {
-        text: " را هم بر عهده دارم، پلتفرم تجارت اجتماعی با بیش از ۵۰۰ هزار دنبال‌کننده، و در ",
+        text: "، پلتفرم تجارت اجتماعی با بیش از ۵۰۰ هزار دنبال‌کننده. مدیر مشارکت ",
       },
       { text: "تدکس تهران", strong: true },
-      {
-        text: " به‌عنوان مدیر مشارکت و هم‌برگزارکنندهٔ رویداد همکاری می‌کنم.",
-      },
+      { text: "، و هم‌برگزارکنندهٔ رویداد از دسامبر ۲۰۲۴ تا مه ۲۰۲۵." },
     ],
-    yearsValue: "۲+",
-    yearsLabel: "سال ساخت محصول",
-    since: "مه ۲۰۲۴",
-    sinceLabel: "فرمالو",
-    statValue: "۳۰هزار+",
-    statLabel: "کسب‌وکار در فرمالو",
-    role: "مدیر محصول",
-    next: "بعدی",
+    facts: [
+      { label: "سابقه", value: "بیش از ۲ سال" },
+      { label: "فرمالو", value: "از مه ۲۰۲۴" },
+      { label: "وادوستان", value: "از ژانویه ۲۰۲۵" },
+    ],
   },
-  experience: {
-    kicker: "کارنامه",
-    title: "تجربه و اثرگذاری",
-    count: "۰۵",
-    roles: [
+  changelog: {
+    title: "تغییرات",
+    lede: "پنج نقش، به شکل انتشار. چهارتا جاری است. یکی در مه ۲۰۲۵ بسته شد.",
+    entries: [
       {
-        role: "مدیر محصول و تضمین کیفیت",
-        org: "فرمالو",
-        meta: "مه ۲۰۲۴ – اکنون · کانادا / انگلستان / استونی",
-        href: companyLinks.formaloo,
-        logo: "/images/formaloo.png",
-        mark: "ف",
-      },
-      {
-        role: "لید محصول و طراحی",
-        org: "وادوستان",
-        meta: "ژانویه ۲۰۲۵ – اکنون · ایران",
-        href: companyLinks.vadostan,
-        logo: "/images/vadostan.jpeg",
-        mark: "و",
-      },
-      {
+        id: "۲۰۲۶٫۰۷",
+        live: true,
+        status: "جاری",
         role: "دستیار آموزشی، بوت‌کمپ مدیریت محصول",
         org: "دیجی‌نکست (دیجی‌کالا)",
         meta: "ژوئیه ۲۰۲۶ – اکنون · آخر هفته · ایران",
+        note: "دستیار آموزشی بوت‌کمپ مدیریت محصول.",
         href: companyLinks.diginext,
         logo: "/images/diginext.png",
-        mark: "د",
       },
       {
-        role: "مدیر مشارکت",
-        org: "تدکس تهران",
-        meta: "آوریل ۲۰۲۲ – اکنون · داوطلبانه",
-        href: companyLinks.tedx,
-        logo: "/images/tedxtehran.png",
-        mark: "ت",
+        id: "۲۰۲۵٫۰۱",
+        live: true,
+        status: "جاری",
+        role: "لید محصول و طراحی",
+        org: "وادوستان",
+        meta: "ژانویه ۲۰۲۵ – اکنون · ایران",
+        note: "بازطراحی مسیر تجربهٔ کاربری.",
+        href: companyLinks.vadostan,
+        logo: "/images/vadostan.jpeg",
       },
       {
+        id: "۲۰۲۴٫۱۲",
+        live: false,
+        status: "بسته",
         role: "هم‌برگزارکننده",
         org: "تدکس تهران",
         meta: "دسامبر ۲۰۲۴ – مه ۲۰۲۵ · داوطلبانه",
+        note: "هم‌برگزاری رویداد. در مه ۲۰۲۵ بسته شد.",
         href: companyLinks.tedx,
         logo: "/images/tedxtehran.png",
-        mark: "ت",
+      },
+      {
+        id: "۲۰۲۴٫۰۵",
+        live: true,
+        status: "جاری",
+        role: "مدیر محصول و تضمین کیفیت",
+        org: "فرمالو",
+        meta: "مه ۲۰۲۴ – اکنون · کانادا / انگلستان / استونی",
+        note: "سخت‌گیری روی کیفیت و انتشار. بازطراحی آنبوردینگ.",
+        href: companyLinks.formaloo,
+        logo: "/images/formaloo.png",
+      },
+      {
+        id: "۲۰۲۲٫۰۴",
+        live: true,
+        status: "جاری",
+        role: "مدیر مشارکت",
+        org: "تدکس تهران",
+        meta: "آوریل ۲۰۲۲ – اکنون · داوطلبانه",
+        note: "ارتباط با شرکا.",
+        href: companyLinks.tedx,
+        logo: "/images/tedxtehran.png",
       },
     ],
   },
-  impact: {
-    kicker: "نتیجه‌ها",
-    title: "شاخص‌های اثرگذاری",
-    count: "۰۴",
-    items: [
+  metrics: {
+    title: "سنجه‌ها",
+    lede: "چهار نتیجه که منبع دارند. چهار رقم برای مقیاس. تمام داشبورد همین است.",
+    outcomeLabel: "نتیجه",
+    sourceLabel: "منبع",
+    outcomes: [
       {
-        mark: "↓",
         figure: "۶۸٪",
         caption: "باگ کمتر در پروداکشن، هر هفته",
-        detail: "فرمالو · سخت‌گیری روی کیفیت و انتشار",
+        source: "فرمالو · سخت‌گیری روی کیفیت و انتشار",
       },
       {
-        mark: "↓",
         figure: "۴۶٪",
         caption: "ریزش کمتر در هفتهٔ اول",
-        detail: "فرمالو · بازطراحی آنبوردینگ",
+        source: "فرمالو · بازطراحی آنبوردینگ",
       },
       {
-        mark: "→",
         figure: "۷ به ۳ دقیقه",
         caption: "زمان تا خرید",
-        detail: "وادوستان · بازطراحی مسیر تجربهٔ کاربری",
+        source: "وادوستان · بازطراحی مسیر تجربهٔ کاربری",
       },
       {
-        mark: "$",
         figure: "+۱۰٬۰۰۰ دلار",
         caption: "اسپانسر جذب‌شده",
-        detail: "تدکس تهران · ارتباط با شرکا",
+        source: "تدکس تهران · ارتباط با شرکا",
       },
     ],
+    scaleLabel: "مقیاس",
     stats: [
-      { value: "+۳۰هزار", label: "کسب‌وکار کاربر فرمالو" },
+      { value: "+۳۰هزار", label: "کسب‌وکارِ فرمالو" },
       { value: "+۵۰۰هزار", label: "دنبال‌کنندهٔ وادوستان" },
       { value: "+۱میلیون", label: "بازدید تدکس تهران" },
       { value: "۸۷٪", label: "افزایش رضایت مشتری" },
     ],
   },
-  projects: {
-    kicker: "ساخته‌های روزانه",
-    title: "هر روز، یک اپ هوش مصنوعی.",
-    count: "∞",
+  builds: {
+    title: "ساخته‌ها",
     intro: [
       { text: "هر روز با " },
-      { text: "Claude Code", strong: true },
-      {
-        text: " یک اپ هوش مصنوعی تازه می‌سازم و منتشر می‌کنم. پایین می‌توانید ببینیدشان.",
-      },
+      { text: "Claude Code", strong: true, latin: true },
+      { text: " یک اپ هوش مصنوعی تازه می‌سازم و منتشر می‌کنم. سه تا از آن‌ها این‌جا عمومی است." },
     ],
-    swipe: "برای دیدن ساخته‌های روزانه به کنار بکشید",
+    open: "باز کردن",
+    specimen: "نمونهٔ صفحه",
     items: [
       {
         day: "روز ۰۱",
         name: "Tasks",
         description:
-          "کارها را پیگیری کنید، فهرست‌ها را به اشتراک بگذارید و با دیگران همکاری کنید. ساخته‌شده با Claude Code و Supabase.",
+          "فهرستی مشترک برای کاری که جلوی دستت است. کارها را پیگیری کن، فهرست را به کس دیگری بسپار، و با هم تمامش کنید. ساخته‌شده با Claude Code و Supabase.",
         href: companyLinks.tasks,
         preview: "۳ از ۷ انجام‌شده",
         tags: ["Claude Code", "Supabase"],
@@ -510,7 +531,7 @@ const fa: Dictionary = {
         day: "روز ۰۲",
         name: "Price of That",
         description:
-          "دیگر به دلار فکر نکنید. Price of That هر قیمتی را، بر اساس حقوق شما، به ساعت‌هایی از زندگی‌تان تبدیل می‌کند تا معلوم شود واقعاً ارزشش را دارد یا نه.",
+          "قیمت را فقط با پول نسنج. هر قیمتی را، بر اساس حقوق تو، به ساعتی از زندگی‌ات تبدیل می‌کند تا معلوم شود واقعاً آن وقت را می‌ارزد یا نه.",
         href: companyLinks.priceOfThat,
         preview: "۱۲٫۴ ساعت",
         tags: ["Claude Code"],
@@ -519,17 +540,16 @@ const fa: Dictionary = {
         day: "روز ۰۳",
         name: "Lapse",
         description:
-          "هر اشتراک، قرارداد و مجوزی را که کسب‌وکارتان روی آن سوار است دنبال می‌کند، تا چیزی بی‌سروصدا با نرخ بالاتر تمدید نشود یا وقتی حواس‌تان نیست ناپدید شود.",
+          "هر اشتراک، قرارداد و مجوزی که کسب‌وکار روی آن می‌چرخد، یک‌جا. تا چیزی بی‌سروصدا با نرخ بالاتر تمدید نشود، یا وقتی جای دیگری را نگاه می‌کنی غیبش بزند.",
         href: companyLinks.lapse,
         preview: "۱٬۲۴۰ دلار در ماه",
         tags: ["Claude Code"],
       },
     ],
   },
-  education: {
-    kicker: "یادگیری",
-    title: "تحصیلات و گواهینامه‌ها",
-    count: "۰۶",
+  appendix: {
+    title: "پیوست",
+    lede: "آموزشی که ثبت شده. مدرک، بوت‌کمپ، و گواهینامه‌هایی که پشت این کارند.",
     items: [
       {
         name: "دانشگاه صنعتی شریف",
@@ -564,36 +584,32 @@ const fa: Dictionary = {
     ],
   },
   contact: {
-    kicker: "حرف بزنیم",
-    line1: "ایده‌ای دارید؟",
-    before: "بیایید ",
-    highlight: "واقعی‌اش کنیم.",
-    intro: "ایمیل‌تان را بگذارید. اگر خواستید نام یا یادداشت هم بنویسید. یا مستقیم ایمیل بزنید.",
-    formTitle: "ایمیل‌تان را بگذارید",
-    formHint: "نام و پیام اختیاری است.",
-    name: "نام (اختیاری)",
+    title: "مسئله را بفرست.",
+    lede: "اگر مسئلهٔ محصول است، نسخهٔ دقیق‌اش را بفرست. ایمیل کافی است. نام و یادداشت اختیاری‌اند. یا مستقیم بنویس.",
+    direct: "یا مستقیم بنویس",
+    name: "نام، اختیاری",
     email: "ایمیل",
-    message: "پیام (اختیاری)",
+    message: "یادداشت، اختیاری",
     submit: "بفرست",
-    sending: "در حال ارسال",
+    sending: "در حال فرستادن",
     successTitle: "رسید.",
-    successBody: "ممنون که ایمیل‌تان را گذاشتید.",
-    errorTitle: "ارسال نشد.",
-    errorBody: "یک بار دیگر تلاش کنید، یا مستقیم ایمیل بزنید.",
-    emailRequired: "ایمیل را وارد کنید.",
-    emailInvalid: "یک ایمیل معتبر وارد کنید.",
+    successBody: "ممنون. آدرس همان چیزی بود که لازم داشتم.",
+    errorTitle: "نرفت.",
+    errorBody: "یک بار دیگر امتحان کن، یا از ایمیل بالا استفاده کن.",
+    emailRequired: "ایمیل را وارد کن.",
+    emailInvalid: "یک ایمیل معتبر وارد کن.",
     nameLong: "نام خیلی طولانی است.",
-    messageLong: "پیام خیلی طولانی است.",
+    messageLong: "یادداشت خیلی طولانی است.",
   },
   footer: {
     role: "مدیر محصول و تضمین کیفیت",
     rights: "© ۲۰۲۶",
-    backToTop: "بالای صفحه",
+    top: "بالا",
   },
   notFound: {
-    title: "صفحه پیدا نشد",
-    body: "این صفحه این‌جا نیست.",
-    home: "بازگشت به خانه",
+    title: "این صفحه در سند نیست.",
+    body: "این نشانی به بخشی از سند نمی‌خورد.",
+    home: "بازگشت به سند",
   },
 };
 

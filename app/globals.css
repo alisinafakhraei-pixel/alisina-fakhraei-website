@@ -91,7 +91,7 @@
   html {
     @apply bg-white font-sans text-black;
     color-scheme: light;
-    scroll-padding-top: 4.5rem;
+    scroll-padding-top: 4rem;
     font-variation-settings: "opsz" 17;
   }
   body {
@@ -135,6 +135,27 @@ html[lang="fa"] .meta-label {
   text-transform: none;
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+.spec-index-mark {
+  background: transparent;
+}
+
+[data-spec-section][data-active] .spec-index-mark {
+  background: #8ecaf2;
+}
+
+dialog.spec-index:not([open]) {
+  display: none;
+}
+
+dialog.spec-index[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+dialog.spec-index::backdrop {
+  background: #000;
 }
 
 @media (prefers-reduced-motion: no-preference) {

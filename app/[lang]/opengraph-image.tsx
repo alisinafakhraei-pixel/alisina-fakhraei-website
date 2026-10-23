@@ -37,27 +37,30 @@ export default async function OpenGraphImage({
           textAlign: isFa ? "right" : "left",
         }}
       >
-        <div style={{ width: 64, height: 4, background: "#8ecaf2" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ fontSize: 22, letterSpacing: isFa ? 0 : 1 }}>AF–SPEC</div>
+          <div style={{ width: 64, height: 4, background: "#8ecaf2" }} />
+        </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              fontSize: isFa ? 76 : 84,
-              lineHeight: isFa ? 1.25 : 0.98,
+              fontSize: isFa ? 72 : 80,
+              lineHeight: isFa ? 1.25 : 0.96,
               fontWeight: 700,
             }}
           >
-            {copy.hero.nameLines[0]}
+            {copy.cover.nameLines[0]}
           </div>
           <div
             style={{
-              fontSize: isFa ? 76 : 84,
-              lineHeight: isFa ? 1.25 : 0.98,
+              fontSize: isFa ? 72 : 80,
+              lineHeight: isFa ? 1.25 : 0.96,
               fontWeight: 700,
             }}
           >
-            {copy.hero.nameLines[1]}
+            {copy.cover.nameLines[1]}
           </div>
-          <div style={{ fontSize: 28, marginTop: 28, lineHeight: 1.4, maxWidth: 780 }}>
+          <div style={{ fontSize: 30, marginTop: 28, lineHeight: 1.35, maxWidth: 860 }}>
             {copy.meta.ogTagline}
           </div>
         </div>

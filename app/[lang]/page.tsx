@@ -1,4 +1,4 @@
-import { HomeView } from "@/components/home-view";
+import { SpecDocument } from "@/components/spec-document";
 import { getDictionary } from "@/lib/content";
 import { companyLinks, isLocale, LINKEDIN, MAILTO, SITE_URL } from "@/lib/site";
 import { notFound } from "next/navigation";
@@ -46,7 +46,7 @@ export default async function Page({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HomeView locale={lang} copy={copy} />
+      <SpecDocument locale={lang} copy={copy} />
     </>
   );
 }
