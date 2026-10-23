@@ -11,7 +11,7 @@ const sans = Google_Sans_Flex({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
-  axes: ["opsz", "ROND"],
+  axes: ["opsz"],
 });
 
 const vazir = Vazirmatn({
@@ -21,7 +21,7 @@ const vazir = Vazirmatn({
 });
 
 export const viewport: Viewport = {
-  themeColor: "#f4f1fb",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 

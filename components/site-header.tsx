@@ -35,15 +35,15 @@ export function SiteHeader({
   const home = localeHome(locale);
 
   return (
-    <header className="sticky top-3 z-40">
-      <div className="flex items-center gap-1 rounded-full bg-card py-1.5 ps-1.5 pe-1.5 shadow-[0_16px_40px_-28px_oklch(0.35_0.08_270/0.7)] lg:ps-3 lg:pe-2">
+    <header className="sticky top-0 z-40 border-b border-black/10 bg-white">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-2 px-4 md:px-6">
         <Button
           nativeButton={false}
           variant="ghost"
-          className="rounded-full px-2"
+          className="px-1"
           render={<Link href={home} />}
         >
-          <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+          <span className="grid size-8 place-items-center rounded-md bg-black text-xs font-semibold text-white">
             AF
           </span>
           <span className="hidden text-sm font-medium sm:inline">
@@ -53,7 +53,7 @@ export function SiteHeader({
 
         <nav
           aria-label={copy.nav.menu}
-          className="ms-2 hidden items-center gap-0.5 lg:flex"
+          className="ms-4 hidden items-center gap-1 lg:flex"
         >
           {links.map(([id, key]) => (
             <Button
@@ -61,7 +61,6 @@ export function SiteHeader({
               nativeButton={false}
               variant="ghost"
               size="sm"
-              className="rounded-full"
               render={<Link href={localeHash(locale, id)} />}
             >
               {copy.nav[key]}
@@ -69,35 +68,41 @@ export function SiteHeader({
           ))}
         </nav>
 
-        <div className="ms-auto flex items-center gap-1">
-          <div className="flex items-center rounded-full bg-muted p-0.5">
-            <Button
-              nativeButton={false}
-              size="sm"
-              variant={locale === "en" ? "default" : "ghost"}
-              className="rounded-full px-2.5"
+        <div className="ms-auto flex items-center gap-2">
+          <div className="flex items-center gap-3 text-sm">
+            <Link
+              href="/"
+              hrefLang="en"
+              lang="en"
               aria-current={locale === "en" ? "page" : undefined}
-              render={<Link href="/" hrefLang="en" lang="en" />}
+              className={
+                locale === "en"
+                  ? "border-b border-primary font-medium text-black"
+                  : "text-black/55 hover:text-black"
+              }
             >
               EN
-            </Button>
-            <Button
-              nativeButton={false}
-              size="sm"
-              variant={locale === "fa" ? "default" : "ghost"}
-              className="font-vazir rounded-full px-2.5"
+            </Link>
+            <Link
+              href="/fa"
+              hrefLang="fa"
+              lang="fa"
               aria-current={locale === "fa" ? "page" : undefined}
-              render={<Link href="/fa" hrefLang="fa" lang="fa" />}
+              className={`font-vazir ${
+                locale === "fa"
+                  ? "border-b border-primary font-medium text-black"
+                  : "text-black/55 hover:text-black"
+              }`}
             >
               فا
-            </Button>
+            </Link>
           </div>
 
           <Button
             nativeButton={false}
             variant="default"
             size="sm"
-            className="hidden rounded-full lg:inline-flex"
+            className="hidden lg:inline-flex"
             render={<a href={MAILTO} />}
           >
             {copy.nav.email}
@@ -109,8 +114,7 @@ export function SiteHeader({
               render={
                 <Button
                   variant="outline"
-                  size="icon-lg"
-                  className="rounded-full"
+                  size="icon"
                   aria-label={copy.nav.openMenu}
                 />
               }
@@ -119,10 +123,10 @@ export function SiteHeader({
             </SheetTrigger>
             <SheetContent
               side={locale === "fa" ? "left" : "right"}
-              className="w-[min(100%,22rem)] bg-card data-[side=left]:rounded-e-[2rem] data-[side=right]:rounded-s-[2rem]"
+              className="w-[min(100%,22rem)] bg-white"
             >
               <SheetHeader>
-                <SheetTitle className="display-title text-2xl">
+                <SheetTitle className="text-lg font-medium">
                   {copy.nav.menu}
                 </SheetTitle>
                 <SheetDescription className="sr-only">
@@ -132,7 +136,7 @@ export function SiteHeader({
               <nav className="flex flex-col gap-1 px-4" aria-label={copy.nav.menu}>
                 <Link
                   href={home}
-                  className="display-title py-2 text-3xl"
+                  className="py-2 text-lg"
                   onClick={() => setOpen(false)}
                 >
                   {copy.nav.home}
@@ -141,7 +145,7 @@ export function SiteHeader({
                   <Link
                     key={id}
                     href={localeHash(locale, id)}
-                    className="display-title py-2 text-3xl"
+                    className="py-2 text-lg"
                     onClick={() => setOpen(false)}
                   >
                     {copy.nav[key]}

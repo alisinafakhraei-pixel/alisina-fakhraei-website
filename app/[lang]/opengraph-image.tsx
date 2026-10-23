@@ -28,86 +28,41 @@ export default async function OpenGraphImage({
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "#f4f1fb",
-          padding: 36,
+          flexDirection: "column",
+          justifyContent: "space-between",
+          background: "#000",
+          color: "#fff",
+          padding: 72,
           fontFamily: "Vazirmatn",
+          textAlign: isFa ? "right" : "left",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            width: "100%",
-            height: "100%",
-            background: "#2d4fe0",
-            color: "#f7f8ff",
-            borderRadius: 56,
-            padding: 56,
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ width: 64, height: 4, background: "#8ecaf2" }} />
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              position: "absolute",
-              top: -90,
-              right: isFa ? undefined : -70,
-              left: isFa ? -70 : undefined,
-              width: 280,
-              height: 280,
-              borderRadius: 999,
-              background: "#ffe14a",
+              fontSize: isFa ? 76 : 84,
+              lineHeight: isFa ? 1.25 : 0.98,
+              fontWeight: 700,
             }}
-          />
+          >
+            {copy.hero.nameLines[0]}
+          </div>
           <div
             style={{
-              position: "absolute",
-              bottom: -80,
-              left: isFa ? undefined : -40,
-              right: isFa ? -40 : undefined,
-              width: 220,
-              height: 220,
-              borderRadius: 80,
-              background: "#9eefd8",
+              fontSize: isFa ? 76 : 84,
+              lineHeight: isFa ? 1.25 : 0.98,
+              fontWeight: 700,
             }}
-          />
-          <div style={{ fontSize: 22, letterSpacing: isFa ? 0 : 2, zIndex: 1 }}>
-            {isFa ? "مدیر محصول" : "PRODUCT MANAGER"}
+          >
+            {copy.hero.nameLines[1]}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", zIndex: 1 }}>
-            <div
-              style={{
-                fontSize: isFa ? 78 : 86,
-                lineHeight: isFa ? 1.25 : 0.92,
-                fontWeight: 700,
-                textAlign: isFa ? "right" : "left",
-              }}
-            >
-              {copy.hero.nameLines[0]}
-            </div>
-            <div
-              style={{
-                fontSize: isFa ? 78 : 86,
-                lineHeight: isFa ? 1.25 : 0.92,
-                fontWeight: 700,
-                textAlign: isFa ? "right" : "left",
-              }}
-            >
-              {copy.hero.nameLines[1]}
-            </div>
-            <div
-              style={{
-                fontSize: 30,
-                marginTop: 28,
-                lineHeight: 1.35,
-                maxWidth: 760,
-                textAlign: isFa ? "right" : "left",
-              }}
-            >
-              {copy.meta.ogTagline}
-            </div>
+          <div style={{ fontSize: 28, marginTop: 28, lineHeight: 1.4, maxWidth: 780 }}>
+            {copy.meta.ogTagline}
           </div>
+        </div>
+        <div style={{ fontSize: 22, color: "#8ecaf2", letterSpacing: isFa ? 0 : 2 }}>
+          {isFa ? "مدیر محصول" : "PRODUCT MANAGER"}
         </div>
       </div>
     ),

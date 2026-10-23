@@ -1,32 +1,17 @@
 import * as React from "react"
 import { cn } from "cn"
 
-const cardTones = {
-  surface:
-    "shape-squircle bg-card text-card-foreground shadow-[0_18px_40px_-28px_oklch(0.35_0.08_270/0.55)]",
-  primary: "shape-squircle bg-primary text-primary-foreground",
-  secondary: "shape-squircle bg-secondary text-secondary-foreground",
-  tertiary: "shape-blob bg-tertiary text-tertiary-foreground",
-  mint: "shape-blob bg-mint text-mint-foreground",
-} as const
-
 function Card({
   className,
   size = "default",
-  tone = "surface",
   ...props
-}: React.ComponentProps<"div"> & {
-  size?: "default" | "sm"
-  tone?: keyof typeof cardTones
-}) {
+}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
   return (
     <div
       data-slot="card"
       data-size={size}
-      data-tone={tone}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden py-(--card-spacing) text-sm [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        cardTones[tone],
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-lg border border-black/10 bg-white py-(--card-spacing) text-sm text-black [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-lg *:[img:last-child]:rounded-b-lg",
         className
       )}
       {...props}
